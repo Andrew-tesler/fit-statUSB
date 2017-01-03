@@ -122,8 +122,8 @@ void main (void)
 	__enable_interrupt();  // Enable interrupts globally
 
 	// Gather information from the card
-	strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
-
+	//strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
+	strcpy(deviceSN,"1234569");
 
 	while (1)
 	{
@@ -500,14 +500,18 @@ void printHelp() {
 
 
 	// Prepare the first line of print
-	strcpy(outString,"*******************************************************\n\r");
+	strcpy(outString,"*******************************************************\n\n\r");
 	// Send the response over USB
 	USBCDC_sendDataInBackground((uint8_t*)outString,
 			strlen(outString),CDC0_INTFNUM,0);
 
+	// add data to String of SN to test
+	strcat(deviceSN,"56987");
 	// Print device SN
 	USBCDC_sendDataInBackground((uint8_t*)deviceSN,
 				strlen(deviceSN),CDC0_INTFNUM,0);
+
+
 
 
 
