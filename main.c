@@ -206,6 +206,7 @@ void main (void)
 						USBCDC_sendDataInBackground((uint8_t*)outString,
 								strlen(outString),CDC0_INTFNUM,0);
 
+
 						// Compare to string #3, and respond
 					} else if (!(strcmp(wholeString, "LED TOGGLE - SLOW"))){
 
@@ -234,6 +235,15 @@ void main (void)
 
 							// Print help screen
 							printHelp();
+
+					} else if (!(strcmp(wholeString, "prog"))){
+						//	Enter Bsl mode (Will reset the USB)
+
+						USB_disconnect();							// Disconnect USB device
+						__disable_interrupt();						// Disable global interrupt
+						((void (*)())0x1000)();						// Set the bsl address
+						USB_connect();								// Connect the USB back on
+
 
 
 							// Compare to string #4, and respond
