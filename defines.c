@@ -6,7 +6,7 @@
  *      Global defines file
  */
 
-#define LED_PORT	GPIO_PORT_P4
-#define LED_R		GPIO_PIN6
-#define LED_G		GPIO_PIN0
-#define LED_B		GPIO_PIN4
+#define LED_PORT	GPIO_PORT_P1
+#define LED_G		GPIO_PIN2
+#define LED_B		GPIO_PIN3
+#define LED_R		GPIO_PIN4
