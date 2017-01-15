@@ -108,11 +108,13 @@ void main (void)
 	// Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
 	PMM_setVCore(PMM_CORE_LEVEL_2);
 
+
 	USBHAL_initPorts();           // Config GPIOS for low-power (output low)
 	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
 	USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
 	// Initialize timers
 	initTimers();
+
 
 	__bis_SR_register( GIE );                                                   // Enable interrupts globally
 
@@ -175,13 +177,13 @@ void main (void)
 				if (retInString(wholeString)){
 
 					// Compare to string #1, and respond
-					if (!(strcmp(wholeString, "LED ON"))){
+					if (!(strcmp(wholeString, "b on"))){
 
 						// Turn off timer; no longer toggling LED
 						Timer_A_stop(TIMER_A0_BASE);
 
 //						// Turn on LED P1.0
-//						GPIO_setOutputHighOnPin(LED_PORT, LED_PIN);
+						GPIO_setOutputLowOnPin(LED_PORT, LED_B);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nLED is ON\r\n\r\n");
@@ -191,13 +193,13 @@ void main (void)
 								strlen(outString),CDC0_INTFNUM,0);
 
 						// Compare to string #2, and respond
-					} else if (!(strcmp(wholeString, "LED OFF"))){
+					} else if (!(strcmp(wholeString, "b off"))){
 
 						// Turn off timer; no longer toggling LED
 						Timer_A_stop(TIMER_A0_BASE);
 
 						// Turn off LED P1.0
-//						GPIO_setOutputLowOnPin(LED_PORT, LED_PIN);
+						GPIO_setOutputHighOnPin(LED_PORT, LED_B);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nLED is OFF\r\n\r\n");
@@ -206,6 +208,65 @@ void main (void)
 						USBCDC_sendDataInBackground((uint8_t*)outString,
 								strlen(outString),CDC0_INTFNUM,0);
 
+
+					} else if (!(strcmp(wholeString, "r on"))){
+
+						// Turn off timer; no longer toggling LED
+						Timer_A_stop(TIMER_A0_BASE);
+
+						// Turn off LED P1.0
+						GPIO_setOutputLowOnPin(LED_PORT, LED_R);
+
+						// Prepare the outgoing string
+						strcpy(outString,"\r\nRed is On\r\n\r\n");
+
+						// Send the response over USB
+						USBCDC_sendDataInBackground((uint8_t*)outString,
+								strlen(outString),CDC0_INTFNUM,0);
+					} else if (!(strcmp(wholeString, "r off"))){
+
+						// Turn off timer; no longer toggling LED
+						Timer_A_stop(TIMER_A0_BASE);
+
+						// Turn off LED P1.0
+						GPIO_setOutputHighOnPin(LED_PORT, LED_R);
+
+						// Prepare the outgoing string
+						strcpy(outString,"\r\nRed is Off\r\n\r\n");
+
+						// Send the response over USB
+						USBCDC_sendDataInBackground((uint8_t*)outString,
+								strlen(outString),CDC0_INTFNUM,0);
+
+					} else if (!(strcmp(wholeString, "g on"))){
+
+						// Turn off timer; no longer toggling LED
+						Timer_A_stop(TIMER_A0_BASE);
+
+						// Turn off LED P1.0
+						GPIO_setOutputLowOnPin(LED_PORT, LED_G);
+
+						// Prepare the outgoing string
+						strcpy(outString,"\r\nGreen is On\r\n\r\n");
+
+						// Send the response over USB
+						USBCDC_sendDataInBackground((uint8_t*)outString,
+								strlen(outString),CDC0_INTFNUM,0);
+
+					} else if (!(strcmp(wholeString, "g off"))){
+
+						// Turn off timer; no longer toggling LED
+						Timer_A_stop(TIMER_A0_BASE);
+
+						// Turn off LED P1.0
+						GPIO_setOutputHighOnPin(LED_PORT, LED_G);
+
+						// Prepare the outgoing string
+						strcpy(outString,"\r\nGreen is Off\r\n\r\n");
+
+						// Send the response over USB
+						USBCDC_sendDataInBackground((uint8_t*)outString,
+								strlen(outString),CDC0_INTFNUM,0);
 
 						// Compare to string #3, and respond
 					} else if (!(strcmp(wholeString, "LED TOGGLE - SLOW"))){
@@ -236,6 +297,15 @@ void main (void)
 							// Print help screen
 							printHelp();
 
+					} else if (wholeString[0] == '#'){
+						// Test Function for Fade in amd out the leds
+						GPIO_toggleOutputOnPin(LED_PORT,LED_G);
+
+
+
+
+						// Compare to string #4, and respond
+
 					} else if (!(strcmp(wholeString, "prog"))){
 						//	Enter Bsl mode (Will reset the USB)
 
@@ -246,8 +316,9 @@ void main (void)
 
 
 
-							// Compare to string #4, and respond
-					} else if (!(strcmp(wholeString,"LED TOGGLE - FAST"))){
+						// Compare to string #4, and respond
+
+					} else if (!(strcmp(wholeString,"led fast"))){
 
 						// Turn off timer
 						Timer_A_stop(TIMER_A0_BASE);
