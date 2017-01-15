@@ -10,6 +10,14 @@
 void initTimers(void) {
 
 
+	Timer_A_initUpModeParam initParam2 = {0};
+
+	initParam2.clockSource				= TIMER_A_CLOCKSOURCE_SMCLK;
+	initParam2.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_1;
+	initParam2.captureCompareInterruptEnable_CCR0_CCIE	= TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE;
+	initParam2.timerPeriod				= 0xFF;
+	initParam2.timerClear				= TIMER_A_DO_CLEAR;
+	initParam2.startTimer				= false;
 
 	Timer_A_initContinuousModeParam initParam = {0};
 	initParam.clockSource 				= TIMER_A_CLOCKSOURCE_SMCLK;
@@ -17,8 +25,10 @@ void initTimers(void) {
 	initParam.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_ENABLE;
 	initParam.timerClear				= TIMER_A_DO_CLEAR;
 	initParam.startTimer				= false;
+
+	Timer_A_initUpMode(TIMER_A0_BASE,&initParam2);
 //
-	Timer_A_initContinuousMode(TIMER_A0_BASE,&initParam);
+//	Timer_A_initContinuousMode(TIMER_A0_BASE,&initParam);
 //
 //
 
@@ -26,26 +36,26 @@ void initTimers(void) {
 	Timer_A_initCompareModeParam initCompareParamcc1 = {0};
 	initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
 	initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
-	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE;
-	initCompareParamcc1.compareValue			= 0x1000;
+	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_RESET_SET;
+	initCompareParamcc1.compareValue			= 102;
 //
 	// Blue
 	Timer_A_initCompareModeParam initCompareParamcc2 = {0};
 	initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
 	initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
-	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE;
-	initCompareParamcc2.compareValue			= 0xAA;
+	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_RESET_SET;
+	initCompareParamcc2.compareValue			= 128;
 
 	// Red
 	Timer_A_initCompareModeParam initCompareParamcc3 = {0};
 	initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
 	initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
-	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE;
-	initCompareParamcc3.compareValue			= 0xFFFF;
+	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_RESET_SET;
+	initCompareParamcc3.compareValue			= 255;
 //
-//	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
+	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
 	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc2);
-	//Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc3);
+	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc3);
 //
 
 	    Timer_A_clearTimerInterrupt( TIMER_A0_BASE );                                    // Clear TAxIFG
@@ -53,10 +63,11 @@ void initTimers(void) {
 	    //Initiaze compare mode
 	    Timer_A_clearCaptureCompareInterrupt(TIMER_A0_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_1 + TIMER_A_CAPTURECOMPARE_REGISTER_2 + TIMER_A_CAPTURECOMPARE_REGISTER_3);
 
-	    Timer_A_startCounter(
-	        TIMER_A0_BASE,
-	        TIMER_A_CONTINUOUS_MODE
-	    );
+	    Timer_A_startCounter(TIMER_A0_BASE,TIMER_A_UP_MODE);
+//	    Timer_A_startCounter(
+//	        TIMER_A0_BASE,
+//	        TIMER_A_CONTINUOUS_MODE
+//	    );
 }
 
 //*****************************************************************************
