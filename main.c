@@ -60,6 +60,7 @@
  */
 #include "hal.h"
 #include "myTimers.h"
+
 #include "defines.c"
 
 // Global flags set by events
@@ -106,16 +107,16 @@ void main (void)
 	WDT_A_hold(WDT_A_BASE); // Stop watchdog timer
 
 	// Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
-	PMM_setVCore(PMM_CORE_LEVEL_2);
+	PMM_setVCore(PMM_CORE_LEVEL_3);
 
 
 	USBHAL_initPorts();           // Config GPIOS for low-power (output low)
 	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
 	USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
 	// Initialize timers
-	initTimers();
 
 
+	initTimers(20,128,20);
 	__bis_SR_register( GIE );                                                   // Enable interrupts globally
 
 
@@ -125,12 +126,12 @@ void main (void)
 
 	// Gather information from the card
 	//strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
-	strcpy(deviceSN,"1234569");
+	strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
 	while (1)
 	{
 		uint8_t ReceiveError = 0, SendError = 0;
-		uint16_t count;
+		//uint16_t count;
 		uint8_t i;
 
 		// Check the USB state and directly main loop accordingly
@@ -139,6 +140,7 @@ void main (void)
 		// This case is executed while your device is enumerated on the
 		// USB host
 		case ST_ENUM_ACTIVE:
+
 
 			// Sleep if there are no bytes to process.
 			__disable_interrupt();
@@ -269,37 +271,52 @@ void main (void)
 								strlen(outString),CDC0_INTFNUM,0);
 
 						// Compare to string #3, and respond
-					} else if (!(strcmp(wholeString, "LED TOGGLE - SLOW"))){
+					} else if (!(strcmp(wholeString, "-v"))){
+
+						//strcat(deviceSN,"56987\t Rev.1.0\n\n\r");
+						// Print device SN
+						USBCDC_sendDataInBackground((uint8_t*)deviceSN,
+								strlen(deviceSN),CDC0_INTFNUM,0);
+
+						// Compare string and respond
+					} else if (!(strcmp(wholeString, "-h"))){
+
+						// Print help screen
+						printHelp();
+
+					} else if (wholeString[0] == '#'){
+						// Test Function for Fade in amd out the leds
 
 						// Turn off timer while changing toggle period
 						Timer_A_stop(TIMER_A0_BASE);
 
-						// Set timer period for slow LED toggle
-//						Timer_A_params.timerPeriod = SlowToggle_Period;
+						int tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 
-//						Timer_A_initUpMode(TIMER_A0_BASE, &Timer_A_params);
+						tempR =  wholeString[1] - '0';
+						tempR2 =  wholeString[2] - '0';
+						tempR = (tempR2 * 10) + tempR;
 
-						// Start timer for toggling
-						Timer_A_startCounter(TIMER_A0_BASE,
-								TIMER_A_UP_MODE);
+						tempG =  wholeString[3] - '0';
+						tempG2 =  wholeString[4] - '0';
+						tempG = (tempG2 * 10) + tempG;
 
+						tempB =  wholeString[5] - '0';
+						tempB2 =  wholeString[6] - '0';
+						tempB = (tempB2 * 10) + tempB;
+
+
+						initTimers(tempR,tempG,tempB);
+
+
+						//GPIO_toggleOutputOnPin(LED_PORT,LED_G);
 						// Prepare the outgoing string
 						strcpy(outString,
-								"\r\nLED is toggling slowly\r\n\r\n");
+								"\r\nColor Changed\n\n\r");
+
 
 						// Send the response over USB
 						USBCDC_sendDataInBackground((uint8_t*)outString,
 								strlen(outString),CDC0_INTFNUM,0);
-
-						// Compare string and respond
-					} else if (!(strcmp(wholeString, "help"))){
-
-							// Print help screen
-							printHelp();
-
-					} else if (wholeString[0] == '#'){
-						// Test Function for Fade in amd out the leds
-						GPIO_toggleOutputOnPin(LED_PORT,LED_G);
 
 
 
@@ -578,8 +595,6 @@ void printHelp() {
 	// HW revision
 	// Status of LEDS
 
-
-
 	// Prepare the first line of print
 	strcpy(outString,"*******************************************************\n\n\r");
 	// Send the response over USB
@@ -587,14 +602,10 @@ void printHelp() {
 			strlen(outString),CDC0_INTFNUM,0);
 
 	// add data to String of SN to test
-	strcat(deviceSN,"56987");
+	//strcat(deviceSN,"56987\t Rev.1.0\n\n\r");
 	// Print device SN
 	USBCDC_sendDataInBackground((uint8_t*)deviceSN,
 				strlen(deviceSN),CDC0_INTFNUM,0);
-
-
-
-
 
 	//strcpy(outString,"SN:deviceSN\t\t\t1235456\n\rDATE:\t\t\t03/01/2017\n\rProgram Revision:\t1.0\n\rHW Revision:\t\t1.0\n\rRed: 0xFFFF\tGreen: 0xFFFE\tBlue: 0xFFFF\n\n\r");
 	USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -602,20 +613,24 @@ void printHelp() {
 
 	// Available commands, Broken to many line to simplify the look of the program
 	// help command
-	strcpy(outString,"help\t\t\t-will print this screen\n\r");
+	strcpy(outString,"\n-h\t\t\t-will print this screen\r\n\r\n");
 		// Send the response over USB
 		USBCDC_sendDataInBackground((uint8_t*)outString,
 				strlen(outString),CDC0_INTFNUM,0);
 		// device SN
-		strcpy(outString,"#sn\t\t\t-Print the device sn\n\r");
+		strcpy(outString,"-v\t\t\t-Print the device sn and revision\r\n\r\n");
 		// Send the response over USB
 		USBCDC_sendDataInBackground((uint8_t*)outString,
 				strlen(outString),CDC0_INTFNUM,0);
 
+		strcpy(outString,"# HTML Color Code - #FFFFFF turn all the LED's ON (White)\t\t\t-\r\n\r\n");
+				// Send the response over USB
+				USBCDC_sendDataInBackground((uint8_t*)outString,
+						strlen(outString),CDC0_INTFNUM,0);
 
 
 	// End of information Line
-	strcpy(outString,"*******************************************************\n\r");
+	strcpy(outString,"*******************************************************\r\n\r\n");
 	// Send the response over USB
 	USBCDC_sendDataInBackground((uint8_t*)outString,
 			strlen(outString),CDC0_INTFNUM,0);
