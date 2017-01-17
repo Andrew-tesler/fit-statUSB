@@ -7,17 +7,31 @@
 #include "myTimers.h"
 #include "hal.h"
 
-void initTimers(void) {
+void initTimers(int Red,int Green,int Blue) {
+
+
+	Timer_A_initUpDownModeParam initUpDownParam = {0};
+	initUpDownParam.clockSource								= TIMER_A_CLOCKSOURCE_SMCLK;
+	initUpDownParam.clockSourceDivider						= TIMER_A_CLOCKSOURCE_DIVIDER_1;
+	initUpDownParam.timerInterruptEnable_TAIE				= TIMER_A_TAIE_INTERRUPT_DISABLE;
+	initUpDownParam.captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
+	initUpDownParam.timerPeriod 							= 0xFF;
+	initUpDownParam.timerClear								= TIMER_A_DO_CLEAR;
+	initUpDownParam.startTimer								= false;
+
+
+
 
 
 	Timer_A_initUpModeParam initParam2 = {0};
 
 	initParam2.clockSource				= TIMER_A_CLOCKSOURCE_SMCLK;
 	initParam2.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_1;
-	initParam2.captureCompareInterruptEnable_CCR0_CCIE	= TIMER_A_CCIE_CCR0_INTERRUPT_ENABLE;
-	initParam2.timerPeriod				= 0xFF;
+	initParam2.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
+	initParam2.captureCompareInterruptEnable_CCR0_CCIE	= TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
+	initParam2.timerPeriod				= 0xFE;
 	initParam2.timerClear				= TIMER_A_DO_CLEAR;
-	initParam2.startTimer				= false;
+	initParam2.startTimer				= true;
 
 	Timer_A_initContinuousModeParam initParam = {0};
 	initParam.clockSource 				= TIMER_A_CLOCKSOURCE_SMCLK;
@@ -25,6 +39,9 @@ void initTimers(void) {
 	initParam.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_ENABLE;
 	initParam.timerClear				= TIMER_A_DO_CLEAR;
 	initParam.startTimer				= false;
+
+
+	//	Timer_A_initUpDownMode(TIMER_A0_BASE,&initUpDownParam);
 
 	Timer_A_initUpMode(TIMER_A0_BASE,&initParam2);
 //
@@ -35,23 +52,23 @@ void initTimers(void) {
 	// Green
 	Timer_A_initCompareModeParam initCompareParamcc1 = {0};
 	initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
-	initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
+	initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
 	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_RESET_SET;
-	initCompareParamcc1.compareValue			= 102;
+	initCompareParamcc1.compareValue			= Green;
 //
 	// Blue
 	Timer_A_initCompareModeParam initCompareParamcc2 = {0};
 	initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
-	initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
+	initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
 	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_RESET_SET;
-	initCompareParamcc2.compareValue			= 128;
+	initCompareParamcc2.compareValue			= Blue;
 
 	// Red
 	Timer_A_initCompareModeParam initCompareParamcc3 = {0};
 	initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
-	initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_ENABLE;
+	initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
 	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_RESET_SET;
-	initCompareParamcc3.compareValue			= 255;
+	initCompareParamcc3.compareValue			= Red;
 //
 	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
 	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc2);
@@ -63,7 +80,16 @@ void initTimers(void) {
 	    //Initiaze compare mode
 	    Timer_A_clearCaptureCompareInterrupt(TIMER_A0_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_1 + TIMER_A_CAPTURECOMPARE_REGISTER_2 + TIMER_A_CAPTURECOMPARE_REGISTER_3);
 
+	    //Timer_A_disableInterrupt(TIMER_A0_BASE);
+
 	    Timer_A_startCounter(TIMER_A0_BASE,TIMER_A_UP_MODE);
+
+
+
+
+
+
+
 //	    Timer_A_startCounter(
 //	        TIMER_A0_BASE,
 //	        TIMER_A_CONTINUOUS_MODE

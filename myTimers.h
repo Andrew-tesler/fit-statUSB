@@ -7,7 +7,7 @@
 #define MYTIMERS_H_
 
 // Prototypes
-void initTimers(void);
+void initTimers(int,int,int);
 
 
 #endif /* MYTIMERS_H_ */
