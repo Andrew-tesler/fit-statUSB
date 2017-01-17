@@ -16,7 +16,7 @@
 // fit both of the vector addresses into the same memory locations ... and they
 // won't fit.
 // *****************************************************************************
-//#pragma vector=ADC12_VECTOR
+//#pragma vector=ADC12_VECTOR //*
 #pragma vector=COMP_B_VECTOR
 #pragma vector=DMA_VECTOR
 #pragma vector=PORT1_VECTOR
@@ -31,7 +31,7 @@
 #pragma vector=TIMER1_A1_VECTOR
 #pragma vector=TIMER2_A0_VECTOR
 #pragma vector=TIMER2_A1_VECTOR
-//#pragma vector=UNMI_VECTOR
+//#pragma vector=UNMI_VECTOR //*
 //#pragma vector=USB_UBM_VECTOR
 #pragma vector=USCI_A0_VECTOR
 #pragma vector=USCI_A1_VECTOR
