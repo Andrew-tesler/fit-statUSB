@@ -120,5 +120,5 @@ include=mdmcpq.inf
 
 [Strings]
 TI="Texas Instruments"
-DESCRIPTION="FitUpTimeVer2"
-DESCRIPTION0="Virtual COM Port (CDC)"
+DESCRIPTION="fitStatusB"
+DESCRIPTION0="fitStatusB Uart"

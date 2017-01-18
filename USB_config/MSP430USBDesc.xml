@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<descTool>
+    <toolOptions>
+        <runGUI>1</runGUI>
+        <workspace>D:\Documents\Work\fit-statUSB\Descriptor</workspace>
+        <projectName>n/a</projectName>
+    </toolOptions>
+    <toolConfig>
+        <treeConfig>
+            <MSP mcuFam="0">
+                <mspConfig>
+                    <disableXtalOnSus>0</disableXtalOnSus>
+                    <XT2OscFreq>31</XT2OscFreq>
+                    <DMAChannel>2</DMAChannel>
+                    <bypassXT2>0</bypassXT2>
+                    <useSYSBIOS>0</useSYSBIOS>
+                    <driveVBUSfromExtSupp>0</driveVBUSfromExtSupp>
+                </mspConfig>
+                <USBDevice>
+                    <deviceProp>
+                        <vid>0x2047</vid>
+                        <pid>0x0301</pid>
+                        <vndStr>COMPULAB</vndStr>
+                        <prodStr>fitStatusB</prodStr>
+                        <devRelNum>0x0001</devRelNum>
+                        <useSerNum>1</useSerNum>
+                    </deviceProp>
+                    <config>
+                        <configParam>
+                            <selfPowered>0</selfPowered>
+                            <remWkupSup>1</remWkupSup>
+                            <maxPowDrain>0</maxPowDrain>
+                            <configStr>fitStatusB</configStr>
+                        </configParam>
+                        <interfaces>
+                            <cdcInterface intString="fitStatusB Uart"/>
+                        </interfaces>
+                    </config>
+                </USBDevice>
+            </MSP>
+        </treeConfig>
+    </toolConfig>
+    <codeGeneration generate="0" generateINF="0"/>
+</descTool>
