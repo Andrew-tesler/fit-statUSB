@@ -73,7 +73,7 @@ void setLeds();
 #define BUFFER_SIZE 256
 char dataBuffer[BUFFER_SIZE] = "";
 char nl[2] = "\n";
-uint16_t count;                    
+
 
 // Function declarations
 uint8_t retInString (char* string);
@@ -95,7 +95,10 @@ char outString[MAX_STR_LENGTH] = "";
 // Device Serial Number 10 Characters
 char deviceSN[25];
 
+#pragma DATA_SECTION ( count, ".infoB" )
+uint16_t count;
 
+uint16_t c = 0;
 
 
 
@@ -116,11 +119,14 @@ void main (void)
 	// Initialize timers
 
 
-	initTimers(20,128,20);
+
 	__bis_SR_register( GIE );                                                   // Enable interrupts globally
 
+	int tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 
+	 c = tempG;
 
+	 initTimers(0,25,0);
 
 	__enable_interrupt();  // Enable interrupts globally
 
@@ -181,14 +187,10 @@ void main (void)
 					// Compare to string #1, and respond
 					if (!(strcmp(wholeString, "b on"))){
 
-						// Turn off timer; no longer toggling LED
-						Timer_A_stop(TIMER_A0_BASE);
-
-//						// Turn on LED P1.0
-						GPIO_setOutputLowOnPin(LED_PORT, LED_B);
+						initTimers(0,0,128);
 
 						// Prepare the outgoing string
-						strcpy(outString,"\r\nLED is ON\r\n\r\n");
+						strcpy(outString,"\r\nBlue is ON\r\n\r\n");
 
 						// Send the response over USB
 						USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -197,14 +199,10 @@ void main (void)
 						// Compare to string #2, and respond
 					} else if (!(strcmp(wholeString, "b off"))){
 
-						// Turn off timer; no longer toggling LED
-						Timer_A_stop(TIMER_A0_BASE);
-
-						// Turn off LED P1.0
-						GPIO_setOutputHighOnPin(LED_PORT, LED_B);
+						initTimers(0,0,0);
 
 						// Prepare the outgoing string
-						strcpy(outString,"\r\nLED is OFF\r\n\r\n");
+						strcpy(outString,"\r\nBlue is OFF\r\n\r\n");
 
 						// Send the response over USB
 						USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -213,12 +211,7 @@ void main (void)
 
 					} else if (!(strcmp(wholeString, "r on"))){
 
-						// Turn off timer; no longer toggling LED
-						Timer_A_stop(TIMER_A0_BASE);
-
-						// Turn off LED P1.0
-						GPIO_setOutputLowOnPin(LED_PORT, LED_R);
-
+						initTimers(128,0,0);
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nRed is On\r\n\r\n");
 
@@ -227,11 +220,7 @@ void main (void)
 								strlen(outString),CDC0_INTFNUM,0);
 					} else if (!(strcmp(wholeString, "r off"))){
 
-						// Turn off timer; no longer toggling LED
-						Timer_A_stop(TIMER_A0_BASE);
-
-						// Turn off LED P1.0
-						GPIO_setOutputHighOnPin(LED_PORT, LED_R);
+						initTimers(0,0,0);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nRed is Off\r\n\r\n");
@@ -242,11 +231,7 @@ void main (void)
 
 					} else if (!(strcmp(wholeString, "g on"))){
 
-						// Turn off timer; no longer toggling LED
-						Timer_A_stop(TIMER_A0_BASE);
-
-						// Turn off LED P1.0
-						GPIO_setOutputLowOnPin(LED_PORT, LED_G);
+						initTimers(0,128,0);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nGreen is On\r\n\r\n");
@@ -257,11 +242,7 @@ void main (void)
 
 					} else if (!(strcmp(wholeString, "g off"))){
 
-						// Turn off timer; no longer toggling LED
-						Timer_A_stop(TIMER_A0_BASE);
-
-						// Turn off LED P1.0
-						GPIO_setOutputHighOnPin(LED_PORT, LED_G);
+						initTimers(0,0,0);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nGreen is Off\r\n\r\n");
@@ -290,7 +271,7 @@ void main (void)
 						// Turn off timer while changing toggle period
 						Timer_A_stop(TIMER_A0_BASE);
 
-						int tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+
 
 						tempR =  wholeString[1] - '0';
 						tempR2 =  wholeString[2] - '0';
@@ -306,6 +287,22 @@ void main (void)
 
 
 						initTimers(tempR,tempG,tempB);
+
+
+
+//						dof
+//						FlashCtl eraseSegment(FlashCtl BASE,
+//						(unsigned char *)INFOD START
+//						);
+//						status = FlashCtl performEraseCheck(FlashCtl BASE,
+//						(unsigned char *)INFOD START,
+//						128
+//						);
+//						gwhile(status == STATUS FAIL);
+//						//Flash write
+//						FlashCtl write32(FlashCtl BASE,
+//						calibration data,
+//						(unsigned long *)(INFOD START),1);
 
 
 						//GPIO_toggleOutputOnPin(LED_PORT,LED_G);
@@ -335,29 +332,7 @@ void main (void)
 
 						// Compare to string #4, and respond
 
-					} else if (!(strcmp(wholeString,"led fast"))){
 
-						// Turn off timer
-						Timer_A_stop(TIMER_A0_BASE);
-
-						// Set timer period for fast LED toggle
-//						Timer_A_params.timerPeriod = FastToggle_Period;
-
-//						Timer_A_initUpMode(TIMER_A0_BASE, &Timer_A_params);
-
-						// Start timer for toggling
-						Timer_A_startCounter(TIMER_A0_BASE,
-								TIMER_A_UP_MODE);
-
-						// Prepare the outgoing string
-						strcpy(outString,
-								"\r\nLED is toggling fast\r\n\r\n");
-
-						// Send the response over USB
-						USBCDC_sendDataInBackground((uint8_t*)outString,
-								strlen(outString),CDC0_INTFNUM,0);
-
-						// Handle other
 					} else {
 
 						// Prepare the outgoing string
@@ -623,7 +598,7 @@ void printHelp() {
 		USBCDC_sendDataInBackground((uint8_t*)outString,
 				strlen(outString),CDC0_INTFNUM,0);
 
-		strcpy(outString,"# HTML Color Code - #FFFFFF turn all the LED's ON (White)\t\t\t-\r\n\r\n");
+		strcpy(outString,"# HTML Color Code - #FFFFFF turn all the LED's ON (White)\t\t\t\r\n\r\n");
 				// Send the response over USB
 				USBCDC_sendDataInBackground((uint8_t*)outString,
 						strlen(outString),CDC0_INTFNUM,0);
@@ -636,4 +611,22 @@ void printHelp() {
 			strlen(outString),CDC0_INTFNUM,0);
 
 
+}
+
+
+void write_infoB( uint16_t *value, uint16_t *flashLocation )
+{
+    uint16_t status;
+
+    // Erase INFOB
+    do {
+         FlashCtl_eraseSegment( (uint8_t*)INFOB_START );
+         status = FlashCtl_performEraseCheck( (uint8_t*)INFOB_START, NUMBER_OF_BYTES );
+    } while (status == STATUS_FAIL);
+
+    // Flash Write
+    FlashCtl_write16( (uint16_t*) value,
+                      (uint16_t*) flashLocation,
+                      1
+    );
 }
