@@ -2,7 +2,7 @@
 <descTool>
     <toolOptions>
         <runGUI>1</runGUI>
-        <workspace>D:\Documents\Work\fit-statUSB\Descriptor</workspace>
+        <workspace>C:\Data\Projects\fitStatusB\USBDescriptors</workspace>
         <projectName>n/a</projectName>
     </toolOptions>
     <toolConfig>
@@ -10,7 +10,7 @@
             <MSP mcuFam="0">
                 <mspConfig>
                     <disableXtalOnSus>0</disableXtalOnSus>
-                    <XT2OscFreq>31</XT2OscFreq>
+                    <XT2OscFreq>14</XT2OscFreq>
                     <DMAChannel>2</DMAChannel>
                     <bypassXT2>0</bypassXT2>
                     <useSYSBIOS>0</useSYSBIOS>
@@ -19,21 +19,21 @@
                 <USBDevice>
                     <deviceProp>
                         <vid>0x2047</vid>
-                        <pid>0x0301</pid>
-                        <vndStr>COMPULAB</vndStr>
-                        <prodStr>fitStatusB</prodStr>
-                        <devRelNum>0x0001</devRelNum>
+                        <pid>0x03DF</pid>
+                        <vndStr>Compulab LTD</vndStr>
+                        <prodStr>fit_StatUSB</prodStr>
+                        <devRelNum>0x25</devRelNum>
                         <useSerNum>1</useSerNum>
                     </deviceProp>
                     <config>
                         <configParam>
                             <selfPowered>0</selfPowered>
-                            <remWkupSup>1</remWkupSup>
-                            <maxPowDrain>0</maxPowDrain>
-                            <configStr>fitStatusB</configStr>
+                            <remWkupSup>0</remWkupSup>
+                            <maxPowDrain>200</maxPowDrain>
+                            <configStr>fit_statUSB</configStr>
                         </configParam>
                         <interfaces>
-                            <cdcInterface intString="fitStatusB Uart"/>
+                            <cdcInterface intString="Compulab fit_StatUSB"/>
                         </interfaces>
                     </config>
                 </USBDevice>

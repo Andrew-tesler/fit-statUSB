@@ -38,13 +38,16 @@
 [Version]
 
 Signature="$Windows NT$" 
-; CatalogFile=MSP430_CDC.cat
+CatalogFile=MSP430_CDC.cat
 ; For information on CatalogFile, please see 
 ; http://msdn.microsoft.com/en-us/library/windows/hardware/ff547502(v=vs.85).aspx
 Class=Ports
 ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
 Provider=%TI%
-DriverVer=09/06/2013, 1.02
+DriverVer=04/07/2014, 1.02
+
+[DefaultInstall]
+CopyINF=msp430_ti_signed.inf
 
 [Manufacturer]
 %TI%=DeviceList, NTamd64
@@ -59,10 +62,36 @@ DefaultDestDir=12
 
 ;You can modify next string and place your VID and PID
 [DeviceList]
-%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_03df
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_03ff&MI_00
+;Single CDC
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_0300
+;CC
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_0313&MI_00
+%DESCRIPTION1%=TIUSB, USB\Vid_2047&Pid_0313&MI_02
+;CH
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_0302&MI_00
+;CHM1
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_0319&MI_01
+;CHM2
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_0320&MI_01
+;CHM3
+%DESCRIPTION0%=TIUSB, USB\Vid_2047&Pid_0321&MI_01
 
 [DeviceList.NTamd64]
-%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_03df
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_03ff&MI_00
+;Single CDC
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_0300
+;CC
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_0313&MI_00
+%DESCRIPTION1%=TIUSB.NTamd64, USB\Vid_2047&Pid_0313&MI_02
+;CH
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_0302&MI_00
+;CHM1
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_0319&MI_01
+;CHM2
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_0320&MI_01
+;CHM3
+%DESCRIPTION0%=TIUSB.NTamd64, USB\Vid_2047&Pid_0321&MI_01
 
  ;------------------------------------------------------------------------------
 ;  Windows 32-bit Sections
@@ -120,5 +149,6 @@ include=mdmcpq.inf
 
 [Strings]
 TI="Texas Instruments"
-DESCRIPTION="fit_StatUSB"
-DESCRIPTION0="Compulab fit_StatUSB"
+DESCRIPTION="TI MSP430 USB"
+DESCRIPTION0="TI MSP430 USB" 
+DESCRIPTION1="TI MSP430 USB"
