@@ -614,6 +614,7 @@ void printHelp() {
 }
 
 
+<<<<<<< HEAD
 //void write_infoB( uint16_t *value, uint16_t *flashLocation )
 //{
 //    uint16_t status;
@@ -630,3 +631,21 @@ void printHelp() {
 //                      1
 //    );
 //}
+=======
+void write_infoB( uint16_t *value, uint16_t *flashLocation )
+{
+    uint16_t status;
+
+    // Erase INFOB
+    do {
+         FlashCtl_eraseSegment( (uint8_t*)INFOB_START );
+         status = FlashCtl_performEraseCheck( (uint8_t*)INFOB_START, NUMBER_OF_BYTES );
+    } while (status == STATUS_FAIL);
+
+    // Flash Write
+    FlashCtl_write16( (uint16_t*) value,
+                      (uint16_t*) flashLocation,
+                      1
+    );
+}
+>>>>>>> ce1e4d57416c413a14ca234504a02588a0e05f8c
