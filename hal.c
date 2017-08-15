@@ -61,6 +61,7 @@ void USBHAL_initPorts(void)
 #ifdef __MSP430_HAS_PORT1_R__
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_ALL);
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_ALL);
+
 #endif
 
 #ifdef __MSP430_HAS_PORT2_R__
@@ -126,7 +127,7 @@ void USBHAL_initPorts(void)
 
 
 
-    //GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
+    GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
     //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
 
 

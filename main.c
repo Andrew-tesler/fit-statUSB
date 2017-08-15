@@ -217,6 +217,7 @@ void main (void)
 
 					} else if (!(strcmp(wholeString, "r on"))){
 
+					    GPIO_setAsOutputPin(LED_PORT,LED_R);
 					    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
 						//initTimers(128,0,0);
 						// Prepare the outgoing string
@@ -226,6 +227,8 @@ void main (void)
 						USBCDC_sendDataInBackground((uint8_t*)outString,
 								strlen(outString),CDC0_INTFNUM,0);
 					} else if (!(strcmp(wholeString, "r off"))){
+
+					    GPIO_setAsInputPin(LED_PORT,LED_R);
 					    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
 //						initTimers(0,0,0);
 
