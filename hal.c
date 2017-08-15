@@ -108,26 +108,26 @@ void USBHAL_initPorts(void)
     GPIO_setAsOutputPin(GPIO_PORT_PJ, GPIO_ALL);
 #endif
 
-    //GPIO_setOutputHighOnPin(LED_PORT,LED_R + LED_G + LED_B);
-    // Porn down the LEDs on SPI CLONE board will need to be deleted in the functional version
-    // Status 1
-    GPIO_setOutputHighOnPin(GPIO_PORT_P4,GPIO_PIN7);
-    // Status 2
-    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN0);
-    // Status 3
-    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN4);
-    // Status 4
-    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN5);
-    // Status 5
-    GPIO_setOutputHighOnPin(GPIO_PORT_P6,GPIO_PIN2);
-    // DETECT PINS
-    GPIO_setOutputHighOnPin(GPIO_PORT_P1,GPIO_ALL);
+    GPIO_setOutputHighOnPin(LED_PORT,LED_R + LED_G + LED_B);
+//    // Porn down the LEDs on SPI CLONE board will need to be deleted in the functional version
+//    // Status 1
+//    GPIO_setOutputHighOnPin(GPIO_PORT_P4,GPIO_PIN7);
+//    // Status 2
+//    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN0);
+//    // Status 3
+//    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN4);
+//    // Status 4
+//    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN5);
+//    // Status 5
+//    GPIO_setOutputHighOnPin(GPIO_PORT_P6,GPIO_PIN2);
+//    // DETECT PINS
+//    GPIO_setOutputHighOnPin(GPIO_PORT_P1,GPIO_ALL);
 
 
 
 
     //GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
-    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+    //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
 
 
 }

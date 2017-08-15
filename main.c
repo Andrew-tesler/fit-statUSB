@@ -134,6 +134,7 @@ void main (void)
 	//strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
 	strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
+
 	while (1)
 	{
 		uint8_t ReceiveError = 0, SendError = 0;
@@ -187,7 +188,9 @@ void main (void)
 					// Compare to string #1, and respond
 					if (!(strcmp(wholeString, "b on"))){
 
-						initTimers(0,0,128);
+					    //GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+					    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+//						initTimers(0,0,128);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nBlue is ON\r\n\r\n");
@@ -199,7 +202,10 @@ void main (void)
 						// Compare to string #2, and respond
 					} else if (!(strcmp(wholeString, "b off"))){
 
-						initTimers(0,0,0);
+//						initTimers(0,0,0);
+
+					    //GPIO_setOutputHighOnPin(LED_PORT,LED_R);
+					    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nBlue is OFF\r\n\r\n");
@@ -211,7 +217,8 @@ void main (void)
 
 					} else if (!(strcmp(wholeString, "r on"))){
 
-						initTimers(128,0,0);
+					    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+						//initTimers(128,0,0);
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nRed is On\r\n\r\n");
 
@@ -219,8 +226,8 @@ void main (void)
 						USBCDC_sendDataInBackground((uint8_t*)outString,
 								strlen(outString),CDC0_INTFNUM,0);
 					} else if (!(strcmp(wholeString, "r off"))){
-
-						initTimers(0,0,0);
+					    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
+//						initTimers(0,0,0);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nRed is Off\r\n\r\n");
@@ -230,8 +237,8 @@ void main (void)
 								strlen(outString),CDC0_INTFNUM,0);
 
 					} else if (!(strcmp(wholeString, "g on"))){
-
-						initTimers(0,128,0);
+					    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+//						initTimers(0,128,0);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nGreen is On\r\n\r\n");
@@ -241,8 +248,8 @@ void main (void)
 								strlen(outString),CDC0_INTFNUM,0);
 
 					} else if (!(strcmp(wholeString, "g off"))){
-
-						initTimers(0,0,0);
+					    GPIO_setOutputHighOnPin(LED_PORT,LED_G);
+//						initTimers(0,0,0);
 
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nGreen is Off\r\n\r\n");
@@ -614,7 +621,7 @@ void printHelp() {
 }
 
 
-<<<<<<< HEAD
+
 //void write_infoB( uint16_t *value, uint16_t *flashLocation )
 //{
 //    uint16_t status;
@@ -631,21 +638,4 @@ void printHelp() {
 //                      1
 //    );
 //}
-=======
-void write_infoB( uint16_t *value, uint16_t *flashLocation )
-{
-    uint16_t status;
 
-    // Erase INFOB
-    do {
-         FlashCtl_eraseSegment( (uint8_t*)INFOB_START );
-         status = FlashCtl_performEraseCheck( (uint8_t*)INFOB_START, NUMBER_OF_BYTES );
-    } while (status == STATUS_FAIL);
-
-    // Flash Write
-    FlashCtl_write16( (uint16_t*) value,
-                      (uint16_t*) flashLocation,
-                      1
-    );
-}
->>>>>>> ce1e4d57416c413a14ca234504a02588a0e05f8c
