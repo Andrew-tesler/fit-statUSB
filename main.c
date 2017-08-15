@@ -217,7 +217,6 @@ void main (void)
 
 					} else if (!(strcmp(wholeString, "r on"))){
 
-
 					    GPIO_setAsOutputPin(LED_PORT,LED_R);
 					    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
 						//initTimers(128,0,0);
