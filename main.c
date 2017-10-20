@@ -167,6 +167,7 @@ void main (void)
 
 
 
+
 				// Add bytes in USB buffer to the string
 				USBCDC_receiveDataInBuffer((uint8_t*)pieceOfString,
 						MAX_STR_LENGTH,
