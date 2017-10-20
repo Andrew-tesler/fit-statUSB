@@ -39,11 +39,13 @@ void allOn() {
 
     GPIO_setAsOutputPin(LED_PORT,LED_B);
     GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+
 }
+
 
 void ledOn(char led) {
 
-    allOff();                                                       // Initially turn off all of the leds
+    allOff();                                                       // Initially turn off all of the LEDs
 
     switch(led) {
     case 'R' :
@@ -51,21 +53,19 @@ void ledOn(char led) {
         GPIO_setOutputLowOnPin(LED_PORT,LED_R);
         break;
     case 'G' :
+        GPIO_setAsOutputPin(LED_PORT,LED_G);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_G);
         break;
     case 'B' :
-        printf("Well done\n" );
-        break;
-    case 'D' :
-        printf("You passed\n" );
-        break;
-    case 'F' :
-        printf("Better try again\n" );
+        GPIO_setAsOutputPin(LED_PORT,LED_B);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_B);
         break;
     default :
-        printf("Invalid LED\n" );
+        break;
     }
 
 }
+
 
 
 

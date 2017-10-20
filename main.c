@@ -189,38 +189,39 @@ void main (void)
 
 					// Compare to string #1, and respond
 					if (!(strcmp(wholeString, "b on"))){
-
+					    ledOn('B');
 					    //GPIO_setOutputLowOnPin(LED_PORT,LED_R);
-					    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+//					    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
 //						initTimers(0,0,128);
 
-						// Prepare the outgoing string
-						strcpy(outString,"\r\nBlue is ON\r\n\r\n");
+					    // Prepare the outgoing string
+					    strcpy(outString,"\r\nBlue is ON\r\n\r\n");
 
-						// Send the response over USB
-						USBCDC_sendDataInBackground((uint8_t*)outString,
-								strlen(outString),CDC0_INTFNUM,0);
+					    // Send the response over USB
+					    USBCDC_sendDataInBackground((uint8_t*)outString,
+					                                strlen(outString),CDC0_INTFNUM,0);
 
-						// Compare to string #2, and respond
+					    // Compare to string #2, and respond
 					} else if (!(strcmp(wholeString, "b off"))){
 
-//						initTimers(0,0,0);
+					    //						initTimers(0,0,0);
 
 					    //GPIO_setOutputHighOnPin(LED_PORT,LED_R);
 					    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
 
-						// Prepare the outgoing string
-						strcpy(outString,"\r\nBlue is OFF\r\n\r\n");
+					    // Prepare the outgoing string
+					    strcpy(outString,"\r\nBlue is OFF\r\n\r\n");
 
-						// Send the response over USB
-						USBCDC_sendDataInBackground((uint8_t*)outString,
-								strlen(outString),CDC0_INTFNUM,0);
+					    // Send the response over USB
+					    USBCDC_sendDataInBackground((uint8_t*)outString,
+					                                strlen(outString),CDC0_INTFNUM,0);
 
 
 					} else if (!(strcmp(wholeString, "r on"))){
 
-					    GPIO_setAsOutputPin(LED_PORT,LED_R);
-					    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+					    ledOn('R');
+//					    GPIO_setAsOutputPin(LED_PORT,LED_R);
+//					    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
 						//initTimers(128,0,0);
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nRed is On\r\n\r\n");
@@ -242,9 +243,9 @@ void main (void)
 								strlen(outString),CDC0_INTFNUM,0);
 
 					} else if (!(strcmp(wholeString, "g on"))){
-					    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+//					    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
 //						initTimers(0,128,0);
-
+					    ledOn('G');
 						// Prepare the outgoing string
 						strcpy(outString,"\r\nGreen is On\r\n\r\n");
 
