@@ -44,9 +44,7 @@ void allOn() {
 
 
 void ledOn(char led) {
-
     allOff();                                                       // Initially turn off all of the LEDs
-
     switch(led) {
     case 'R' :
         GPIO_setAsOutputPin(LED_PORT,LED_R);
@@ -60,11 +58,34 @@ void ledOn(char led) {
         GPIO_setAsOutputPin(LED_PORT,LED_B);
         GPIO_setOutputLowOnPin(LED_PORT,LED_B);
         break;
+    case 'S' : // SAGOL
+        GPIO_setAsOutputPin(LED_PORT,LED_R);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+        GPIO_setAsOutputPin(LED_PORT,LED_B);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+        break;
+    case 'Y' : //Yellow
+        GPIO_setAsOutputPin(LED_PORT,LED_G);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+        GPIO_setAsOutputPin(LED_PORT,LED_R);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+        break;
+    case 'T' : // Turkiz
+        GPIO_setAsOutputPin(LED_PORT,LED_G);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+        GPIO_setAsOutputPin(LED_PORT,LED_B);
+        GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+        break;
+    case 'W' :
+        allOn();
+        break;
     default :
         break;
     }
 
 }
+
+
 
 
 
