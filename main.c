@@ -52,7 +52,7 @@
 #include "USB_API/USB_Common/usb.h"                 // USB-specific functions
 #include "USB_API/USB_CDC_API/UsbCdc.h"
 #include "USB_app/usbConstructs.h"
-
+#include "usbLed.h"
 
 /*
  * NOTE: Modify hal.h to select a specific evaluation board and customize for
@@ -112,6 +112,7 @@ void main (void)
 	// Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
 	PMM_setVCore(PMM_CORE_LEVEL_3);
 
+	ledOn('r');
 
 	USBHAL_initPorts();           // Config GPIOS for low-power (output low)
 	USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
