@@ -135,6 +135,7 @@ void main (void)
     //strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
     strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
+    allOff();
 
     while (1)
     {
@@ -167,6 +168,7 @@ void main (void)
             // Exit LPM because of a data-receive event, and
             // fetch the received data
             if (bCDCDataReceived_event){
+
 
 
 
