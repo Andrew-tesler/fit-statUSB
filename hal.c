@@ -43,6 +43,14 @@
 #include "hal.h"
 #include "defines.c"
 
+#define LF_CRYSTAL_FREQUENCY_IN_HZ     32768                                    // 32KHz
+#define HF_CRYSTAL_FREQUENCY_IN_HZ     12000000                                  // 12MHz
+
+#define MCLK_DESIRED_FREQUENCY_IN_KHZ  12000                                     // 26MHz
+#define MCLK_FLLREF_RATIO              MCLK_DESIRED_FREQUENCY_IN_KHZ / ( UCS_REFOCLK_FREQUENCY / 1024 )    // Ratio = 250
+
+
+
 #define GPIO_ALL	GPIO_PIN0|GPIO_PIN1|GPIO_PIN2|GPIO_PIN3| \
 					GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
 
@@ -128,17 +136,50 @@ void USBHAL_initPorts(void)
 
 
     GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
-    //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
 
 
 }
 
 void USBHAL_initClocks(uint32_t mclkFreq)
 {
+
+    // Crystal Alternative function pins
+    GPIO_setAsPeripheralModuleFunctionInputPin(
+            GPIO_PORT_P5,                                // XIN  on P5.4
+            GPIO_PIN3 +                                  // XT2OUT on P5.3
+            GPIO_PIN2                                    // XT2IN  on P5.2
+    );
+
+
+    PMM_setVCore( PMM_CORE_LEVEL_3 );
+
+    UCS_turnOnXT2( UCS_XT2_DRIVE_8MHZ_16MHZ );
+
+    UCS_setExternalClockSource(
+                LF_CRYSTAL_FREQUENCY_IN_HZ,                                         // XT1CLK input
+                HF_CRYSTAL_FREQUENCY_IN_HZ                                          // XT2CLK input
+        );
+
+
+
 	UCS_initClockSignal(
 	   UCS_FLLREF,
 	   UCS_REFOCLK_SELECT,
 	   UCS_CLOCK_DIVIDER_1);
+
+    // Select XT2 as oscillator source for SMCLK
+    UCS_initClockSignal(
+            UCS_SMCLK,                                   // Clock you're configuring
+            UCS_XT2CLK_SELECT,                           // Clock source
+            UCS_CLOCK_DIVIDER_1                          // Divide down clock source by this much
+    );
+    UCS_initClockSignal(
+               UCS_MCLK,
+               UCS_XT2CLK_SELECT,
+               UCS_CLOCK_DIVIDER_1
+       );
+
 
 	UCS_initClockSignal(
 	   UCS_ACLK,

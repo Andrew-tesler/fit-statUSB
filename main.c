@@ -115,7 +115,7 @@ void main (void)
     ledOn('r');
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)
-    USBHAL_initClocks(8000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
+    USBHAL_initClocks(12000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
     USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
     // Initialize timers
 
@@ -202,6 +202,9 @@ void main (void)
                         break;
                     case '#' :
                         // Prepare the String
+                       // allOn();
+                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
                         strcpy(outString,"\r\nPressed Fade Command\r\n\r\n");
                         // Send the String to USB
                         USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -337,7 +340,8 @@ void main (void)
                         // Turn off timer while changing toggle period
                         Timer_A_stop(TIMER_A0_BASE);
 
-
+                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
 
                         tempR =  wholeString[1] - '0';
                         tempR2 =  wholeString[2] - '0';

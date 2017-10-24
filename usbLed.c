@@ -16,14 +16,17 @@
  */
 void allOff() {
 
-    GPIO_setAsInputPin(LED_PORT,LED_R);
-    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
+    GPIO_setAsOutputPin(LED_PORT,LED_R);
+    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+//    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
 
-    GPIO_setAsInputPin(LED_PORT,LED_G);
-    GPIO_setOutputHighOnPin(LED_PORT,LED_G);
+    GPIO_setAsOutputPin(LED_PORT,LED_G);
+    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+//    GPIO_setOutputHighOnPin(LED_PORT,LED_G);
 
-    GPIO_setAsInputPin(LED_PORT,LED_B);
-    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
+    GPIO_setAsOutputPin(LED_PORT,LED_B);
+    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+//    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
 
 }
 
@@ -32,13 +35,16 @@ void allOff() {
  */
 void allOn() {
     GPIO_setAsOutputPin(LED_PORT,LED_R);
-    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+//    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
 
     GPIO_setAsOutputPin(LED_PORT,LED_G);
-    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+//    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+    GPIO_setOutputHighOnPin(LED_PORT,LED_G);
 
     GPIO_setAsOutputPin(LED_PORT,LED_B);
-    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+//    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
 
 }
 
@@ -48,15 +54,18 @@ void ledOn(char led) {
     switch(led) {
     case 'R' :
         GPIO_setAsOutputPin(LED_PORT,LED_R);
-        GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+//        GPIO_setOutputLowOnPin(LED_PORT,LED_R);
+        GPIO_setOutputHighOnPin(LED_PORT,LED_R);
         break;
     case 'G' :
         GPIO_setAsOutputPin(LED_PORT,LED_G);
-        GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+//        GPIO_setOutputLowOnPin(LED_PORT,LED_G);
+        GPIO_setOutputHighOnPin(LED_PORT,LED_G);
         break;
     case 'B' :
         GPIO_setAsOutputPin(LED_PORT,LED_B);
-        GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+//        GPIO_setOutputLowOnPin(LED_PORT,LED_B);
+        GPIO_setOutputHighOnPin(LED_PORT,LED_B);
         break;
     case 'S' : // SAGOL
         GPIO_setAsOutputPin(LED_PORT,LED_R);
