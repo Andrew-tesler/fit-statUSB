@@ -5,8 +5,7 @@
  *      Author: Andrew Tesler
  *      andrey@compulab.co.il
  *
- *      Will collect all the functions related to the LEDS
- *      of the fit-statUSB device
+ *      Help function for turning the Leds on/off
  */
 
 #include "usbLed.h"

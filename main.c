@@ -30,17 +30,11 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
 /*  
- * ======== main.c ========
- * Local Echo Demo:
+ * fitStatusB device
+ * Andrey.tesler@compulab.co.il
  *
- * This example simply echoes back characters it receives from the host.  
- * Unless the terminal application has a built-in echo feature turned on, 
- * typing characters into it only causes them to be sent; not displayed locally.
- * This application causes typing in Hyperterminal to feel like typing into any 
- * other PC application ? characters get displayed.  
- *
- * ----------------------------------------------------------------------------+
- * Please refer to the Examples Guide for more details.
+ * MSP430 emulates as HID UART device Wit for command from the user and then
+ * turn LEDS on / off depending on the commands
  * ---------------------------------------------------------------------------*/
 #include <string.h>
 
