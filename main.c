@@ -93,6 +93,7 @@ void printHelp(void);
 
 // ******************************************** INITIAL INITIALAZATION ********************************
 //void setLeds();
+// https://git-server/Andrew/fit-statUSB/wikis/Internal-Flash-Mapping                                   // Compulab Wiki page for memory mapping
 // Revision information from Flash
 char *MAJOR1_ptrB = (char *)INFOB_START;                                                                // Major Revision Start
 char *MINOR1_ptrB = (char *)INFOB_START+2;                                                              // Minor Revision start
@@ -105,9 +106,6 @@ char *SERIAL_ptrB = (char *)INFOB_START+4;                                      
 // ******************************************** TESTING ***********************************************
 
 
-
-
-
 //#pragma DATA_SECTION ( count, ".infoB" )
 
 // ****************************************************************************************************
@@ -118,12 +116,10 @@ char *SERIAL_ptrB = (char *)INFOB_START+4;                                      
 ******************************************************************************************************/
 void main (void)
 {
-    WDT_A_hold(WDT_A_BASE); // Stop watchdog timer
+    WDT_A_hold(WDT_A_BASE);                                                                             // Stop watchdog timer
+    PMM_setVCore(PMM_CORE_LEVEL_3);                                                                     // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
 
-    // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
-    PMM_setVCore(PMM_CORE_LEVEL_3);
-
-    ledOn('r');
+    //ledOn('r');
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)
     USBHAL_initClocks(12000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
@@ -131,7 +127,7 @@ void main (void)
     // Initialize timers
 
 
-    //FLASH_ptrB = (char *)INFOB_START;
+    // Collect all the Device information in to one string
     strcat(deviceSN,"REV:");
     strncat(deviceSN,(char *)MAJOR1_ptrB,2);
     strcat(deviceSN,".");
