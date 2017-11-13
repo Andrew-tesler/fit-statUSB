@@ -65,6 +65,8 @@ volatile uint16_t led;                                                          
 #define BUFFER_SIZE 256
 #define MAX_STR_LENGTH 128
 
+#define INFOB_START   (0x1900)
+
 // ****************************************************************************************************
 
 
@@ -74,7 +76,7 @@ char nl[2] = "\n";
 char wholeString[MAX_STR_LENGTH] = "";                                                                  // Entire input str from last 'return'
 char pieceOfString[MAX_STR_LENGTH] = "";                                                                // Holds the new addition to the string
 char outString[MAX_STR_LENGTH] = "";                                                                    // Holds the outgoing string
-char deviceSN[25];
+char deviceSN[128];
 uint16_t count;
 uint16_t c = 0;
 
@@ -90,14 +92,23 @@ void printHelp(void);
 
 
 // ******************************************** INITIAL INITIALAZATION ********************************
-void setLeds();
+//void setLeds();
+// Revision information from Flash
+char *MAJOR1_ptrB = (char *)INFOB_START;                                                                // Major Revision Start
+char *MINOR1_ptrB = (char *)INFOB_START+2;                                                              // Minor Revision start
+
+char *SERIAL_ptrB = (char *)INFOB_START+4;                                                              // Serial Number Start
 
 // ****************************************************************************************************
 
 
 // ******************************************** TESTING ***********************************************
 
-#pragma DATA_SECTION ( count, ".infoB" )
+
+
+
+
+//#pragma DATA_SECTION ( count, ".infoB" )
 
 // ****************************************************************************************************
 
@@ -120,6 +131,16 @@ void main (void)
     // Initialize timers
 
 
+    //FLASH_ptrB = (char *)INFOB_START;
+    strcat(deviceSN,"REV:");
+    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
+    strcat(deviceSN,".");
+    strncat(deviceSN,(char *)MINOR1_ptrB,2);
+    strcat(deviceSN,"\r\nSerial: ");
+    strncat(deviceSN,(char *)SERIAL_ptrB,10);
+    strcat(deviceSN,"\r\n\r\n");
+
+
 
     __bis_SR_register( GIE );                                                   // Enable interrupts globally
 
@@ -133,7 +154,7 @@ void main (void)
 
     // Gather information from the card
     //strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
-    strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
+  //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
     allOff();
 
@@ -225,10 +246,18 @@ void main (void)
                             USB_connect();                              // Connect the USB back on
 
                         }
+                        /// Test If for String outputs // TODO remove in final version
+                        else if (wholeString[1] =='T') {
+
+                            USBCDC_sendDataInBackground((uint8_t*)deviceSN,
+                                                        strlen(deviceSN),CDC0_INTFNUM,0);
+                        }
 
                         else if (wholeString[1] =='H') {
                             printHelp();
                         }
+
+
                         else {
                             // Prepare the String
                             strcpy(outString,"\r\nPressed Command String\r\n\r\n");
