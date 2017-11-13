@@ -33,72 +33,78 @@
  * fitStatusB device
  * Andrey.tesler@compulab.co.il
  *
- * MSP430 emulates as HID UART device Wit for command from the user and then
+ * MSP430 emulates as USB CDC UART device Wit for command from the user and then
  * turn LEDS on / off depending on the commands
  * ---------------------------------------------------------------------------*/
-#include <string.h>
 
-#include "driverlib.h"
+// ******************************************** INCLUDE ***********************************************
+#include <string.h>                                                                                     // String library to handle the String
+#include "driverlib.h"                                                                                  // Ti Driver library for MSP430 Devices
+#include "USB_config/descriptors.h"                                                                     // USB descriptors
+#include "USB_API/USB_Common/device.h"                                                                  // Part of TI USP API library
+#include "USB_API/USB_Common/usb.h"                                                                     // Part of TI USP API library
+#include "USB_API/USB_CDC_API/UsbCdc.h"                                                                 // Part of TI USP API library USB CDC
+#include "USB_app/usbConstructs.h"                                                                      // Part of TI USP API library
+#include "hal.h"                                                                                        // Ti Board specific functions  // TODO remove this or add board specific
+
+#include "usbLed.h"                                                                                     // Help functions for the LED's
+#include "myTimers.h"                                                                                   // Timer specific functions
+#include "defines.c"                                                                                    // Global defines for the whole project
+
+// ****************************************************************************************************
 
 
-#include "USB_config/descriptors.h"
-#include "USB_API/USB_Common/device.h"
-#include "USB_API/USB_Common/usb.h"                 // USB-specific functions
-#include "USB_API/USB_CDC_API/UsbCdc.h"
-#include "USB_app/usbConstructs.h"
-#include "usbLed.h"
+// ******************************************** FILE GLOBALS ******************************************
+volatile uint8_t bCDCDataReceived_event = FALSE;                                                        // Flag set by event handler to indicate data has been received into USB buffer
+volatile uint16_t led;                                                                                  // TODO Check what this doo
 
-/*
- * NOTE: Modify hal.h to select a specific evaluation board and customize for
- * your own board.
- */
-#include "hal.h"
-#include "myTimers.h"
+// ****************************************************************************************************
 
-#include "defines.c"
 
-// Global flags set by events
-volatile uint8_t bCDCDataReceived_event = FALSE;  // Flag set by event handler to 
-volatile uint16_t led;
-// indicate data has been
-// received into USB buffer
-void setLeds();
-
+// ******************************************** FILE DEFINES ******************************************
 #define BUFFER_SIZE 256
+#define MAX_STR_LENGTH 128
+
+// ****************************************************************************************************
+
+
+// ******************************************** INITIALAZATION ****************************************
 char dataBuffer[BUFFER_SIZE] = "";
 char nl[2] = "\n";
+char wholeString[MAX_STR_LENGTH] = "";                                                                  // Entire input str from last 'return'
+char pieceOfString[MAX_STR_LENGTH] = "";                                                                // Holds the new addition to the string
+char outString[MAX_STR_LENGTH] = "";                                                                    // Holds the outgoing string
+char deviceSN[25];
+uint16_t count;
+uint16_t c = 0;
+
+// ****************************************************************************************************
 
 
-// Function declarations
+// ******************************************** FUNCTION DECLARATION **********************************
 uint8_t retInString (char* string);
 void printHelp(void);
 
-#define MAX_STR_LENGTH 128
-char wholeString[MAX_STR_LENGTH] = ""; // Entire input str from last 'return'
+
+// ****************************************************************************************************
 
 
-// Holds the new addition to the string
-char pieceOfString[MAX_STR_LENGTH] = "";
+// ******************************************** INITIAL INITIALAZATION ********************************
+void setLeds();
 
-// Holds the outgoing string
-char outString[MAX_STR_LENGTH] = "";
+// ****************************************************************************************************
 
-//*****************************************************************************
-// Global device values
-//*****************************************************************************
-// Device Serial Number 10 Characters
-char deviceSN[25];
+
+// ******************************************** TESTING ***********************************************
 
 #pragma DATA_SECTION ( count, ".infoB" )
-uint16_t count;
 
-uint16_t c = 0;
-
+// ****************************************************************************************************
 
 
-/*----------------------------------------------------------------------------+
- | Main Routine                                                                |
- +----------------------------------------------------------------------------*/
+/*****************************************************************************************************
+*                                              MAIN FUNCTION
+******************************************************************************************************/
 void main (void)
 {
     WDT_A_hold(WDT_A_BASE); // Stop watchdog timer
