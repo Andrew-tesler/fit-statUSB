@@ -128,7 +128,6 @@ void main (void)
     WDT_A_hold(WDT_A_BASE);                                                                             // Stop watchdog timer
     PMM_setVCore(PMM_CORE_LEVEL_3);                                                                     // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
 
-    //ledOn('r');
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)
     USBHAL_initClocks(12000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
@@ -195,11 +194,6 @@ void main (void)
             // fetch the received data
             if (bCDCDataReceived_event){
 
-
-
-
-
-
                 // Add bytes in USB buffer to the string
                 USBCDC_receiveDataInBuffer((uint8_t*)pieceOfString,
                                            MAX_STR_LENGTH,
@@ -217,25 +211,42 @@ void main (void)
 
                 // Has the user pressed return yet?
                 if (retInString(wholeString)){
+
                     switch(wholeString[0]) {
-                    case '@' :
-                        ledOn(wholeString[1]);
-                        // Prepare the String
-                        strcpy(outString,"\r\nLED is ON\r\n\r\n");
-                        // Send the String to USB
+                    case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
+                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
+
+                        strcpy(outString,"\r\nLED is ON\r\n\r\n");                                      // Prepare String for Console print
+
                         USBCDC_sendDataInBackground((uint8_t*)outString,
-                                                    strlen(outString),CDC0_INTFNUM,0);
+                                                    strlen(outString),CDC0_INTFNUM,0);                  // Send the String to USB Console
                         break;
-                    case '#' :
-                        // Prepare the String
-                       // allOn();
-                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);
-                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+
+                    case '#' :                                                                          // Set Led color #RRGGBB
+                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
                         strcpy(outString,"\r\nPressed Fade Command\r\n\r\n");
                         // Send the String to USB
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
                         break;
+
+                    case 'B' :
+                        // Set color sequence transition from one color to another issue #8
+                        strcpy(outString,"\r\n… Set color sequence\r\n\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                                            strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+                    case '?' :
+                        // Return fit-statUSB ID
+                        // Return the Serial number of the device
+                        // For now return ATP-programmed number.
+                        // TODO Change the serial to return only Serial number without all of the REV string....
+                        USBCDC_sendDataInBackground((uint8_t*)deviceSN,
+                                                                                strlen(deviceSN),CDC0_INTFNUM,0);
+                        break;
+
 
                     case '-' :
 
