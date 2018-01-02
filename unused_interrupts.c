@@ -23,8 +23,8 @@
 #pragma vector=PORT2_VECTOR
 #pragma vector=RTC_VECTOR
 #pragma vector=SYSNMI_VECTOR
-#pragma vector=TIMER0_A0_VECTOR
-#pragma vector=TIMER0_A1_VECTOR
+//#pragma vector=TIMER0_A0_VECTOR
+//#pragma vector=TIMER0_A1_VECTOR
 #pragma vector=TIMER0_B0_VECTOR
 #pragma vector=TIMER0_B1_VECTOR
 #pragma vector=TIMER1_A0_VECTOR

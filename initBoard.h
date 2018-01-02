@@ -37,6 +37,7 @@
  */
 
 
+#include "driverlib.h"
 /*----------------------------------------------------------------------------
  * The following function names are deprecated.  These were updated to new 
  * names to follow OneMCU naming convention.
@@ -48,7 +49,7 @@
 #endif
 
 void USBHAL_initPorts(void);
-void USBHAL_initClocks(uint32_t mclkFreq);
+void USBHAL_initClocks(uint32_t);
 
 
 //Released_Version_5_10_00_17
