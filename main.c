@@ -248,6 +248,26 @@ void main (void)
                         break;
 
 
+                    case 'F':
+                        // Set fading (transition) period in ms
+                        // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
+
+                        strcpy(outString,"\r\nSet fading period\r\n\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+
+                    case 'G':
+                        // get current color
+                        // TODO should be some value that is stored in the internal device Flash
+                        // Returns print #RRGGBB
+
+                        strcpy(outString,"\r\nDevice color #RRGGBB\r\n\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
                     case '-' :
 
                         if (wholeString[1] == 'P') {
@@ -284,9 +304,12 @@ void main (void)
                         break;
 
                     default :
+                        strcpy(outString,"\n");                                                         // Send new Line when return pressed
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
                         break;
                     }
-
+/*
                     //					// Compare to string #1, and respond
                     //					if (!(strcmp(wholeString, "b on"))){
                     //					    ledOn('B');
@@ -457,6 +480,7 @@ void main (void)
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
                     }
+                    */
 
                     // Clear the string in preparation for the next one
                     for (i = 0; i < MAX_STR_LENGTH; i++){
