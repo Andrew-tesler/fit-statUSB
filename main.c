@@ -37,8 +37,17 @@
  * turn LEDS on / off depending on the commands
  * ---------------------------------------------------------------------------*/
 
+// ****************************************************************************
+
+/* If additional device added add code in the following functions:
+targetFlashDetection()
+ */
+
+// SBC-FLT Defines
+
+
 // ******************************************** INCLUDE ***********************************************
-#include <initBoard.h>                                                                                        // Ti Board specific functions  // TODO remove this or add board specific
+#include <initBoard.h>                                                                                  // Ti Board specific functions  // TODO remove this or add board specific
 #include <string.h>                                                                                     // String library to handle the String
 #include "driverlib.h"                                                                                  // Ti Driver library for MSP430 Devices
 #include "USB_config/descriptors.h"                                                                     // USB descriptors
@@ -49,6 +58,7 @@
 #include "usbLed.h"                                                                                     // Help functions for the LED's
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project
+
 
 // ****************************************************************************************************
 
