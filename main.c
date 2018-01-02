@@ -38,6 +38,7 @@
  * ---------------------------------------------------------------------------*/
 
 // ******************************************** INCLUDE ***********************************************
+#include <initBoard.h>                                                                                        // Ti Board specific functions  // TODO remove this or add board specific
 #include <string.h>                                                                                     // String library to handle the String
 #include "driverlib.h"                                                                                  // Ti Driver library for MSP430 Devices
 #include "USB_config/descriptors.h"                                                                     // USB descriptors
@@ -45,8 +46,6 @@
 #include "USB_API/USB_Common/usb.h"                                                                     // Part of TI USP API library
 #include "USB_API/USB_CDC_API/UsbCdc.h"                                                                 // Part of TI USP API library USB CDC
 #include "USB_app/usbConstructs.h"                                                                      // Part of TI USP API library
-#include "hal.h"                                                                                        // Ti Board specific functions  // TODO remove this or add board specific
-
 #include "usbLed.h"                                                                                     // Help functions for the LED's
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project

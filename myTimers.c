@@ -4,8 +4,8 @@
 
 //***** Header Files **********************************************************
 #include <driverlib.h>
+#include <initBoard.h>
 #include "myTimers.h"
-#include "hal.h"
 #include "defines.c"
 
 void initTimers(int Red,int Green,int Blue) {

@@ -33,6 +33,7 @@
  * ======== hal.c ========
  *
  */
+#include <initBoard.h>
 #include "msp430.h"
 
 #include "driverlib.h"
@@ -40,7 +41,6 @@
 #include "USB_API/USB_Common/device.h"
 #include "USB_config/descriptors.h"
 
-#include "hal.h"
 #include "defines.c"
 
 #define LF_CRYSTAL_FREQUENCY_IN_HZ     32768                                    // 32KHz
