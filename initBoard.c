@@ -54,6 +54,9 @@
 #define GPIO_ALL	GPIO_PIN0|GPIO_PIN1|GPIO_PIN2|GPIO_PIN3| \
 					GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
 
+uint32_t myACLK;
+uint32_t mySMCLK;
+uint32_t myMCLK;
 
 
 /*
@@ -189,6 +192,7 @@ void USBHAL_initClocks(uint32_t mclkFreq)
     UCS_initFLLSettle(
         mclkFreq/1000,
         mclkFreq/32768);
+
 
 }
 //Released_Version_5_10_00_17

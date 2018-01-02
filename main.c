@@ -141,7 +141,7 @@ void main (void)
 
     int tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 
-    c = tempG;
+    //c = tempG;
 
     initTimers(0,25,0);
 
