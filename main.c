@@ -152,7 +152,7 @@ void main (void)
 
     //c = tempG;
 
-    initTimers(0,25,0);
+   // initTimers(100,0,100);
 
     __enable_interrupt();  // Enable interrupts globally
 
@@ -223,8 +223,25 @@ void main (void)
                         break;
 
                     case '#' :                                                                          // Set Led color #RRGGBB
+                        Timer_A_stop(TIMER_A0_BASE);
                         GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+
+                        tempR =  wholeString[1] - '0';
+                        tempR2 =  wholeString[2] - '0';
+                        tempR = (tempR2 * 10) + tempR;
+
+                        tempG =  wholeString[3] - '0';
+                        tempG2 =  wholeString[4] - '0';
+                        tempG = (tempG2 * 10) + tempG;
+
+                        tempB =  wholeString[5] - '0';
+                        tempB2 =  wholeString[6] - '0';
+                        tempB = (tempB2 * 10) + tempB;
+
+
+                        initTimers(tempR,tempG,tempB);
+
                         strcpy(outString,"\r\nPressed Fade Command\r\n\r\n");
                         // Send the String to USB
                         USBCDC_sendDataInBackground((uint8_t*)outString,
