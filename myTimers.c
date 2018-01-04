@@ -102,6 +102,10 @@ void initTimers(int Red,int Green,int Blue) {
 //	    );
 }
 
+// Fade the leds from given color to given color by the time given
+void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, long  time) {
+
+}
 //*****************************************************************************
 // Interrupt Service Routine
 //*****************************************************************************

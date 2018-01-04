@@ -269,7 +269,7 @@ void main (void)
                     case 'F':
                         // Set fading (transition) period in ms
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
-
+                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);

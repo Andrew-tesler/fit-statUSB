@@ -8,6 +8,7 @@
 
 // Prototypes
 void initTimers(int,int,int);
+void initfade(int,int,int,int,int,int,long);
 
 
 #endif /* MYTIMERS_H_ */
