@@ -127,6 +127,7 @@ void main (void)
 {
     WDT_A_hold(WDT_A_BASE);                                                                             // Stop watchdog timer
     PMM_setVCore(PMM_CORE_LEVEL_3);                                                                     // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
+// REFTCOFF 0   REF Temp.Sensor off
 
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)

@@ -26,11 +26,11 @@ void initTimers(int Red,int Green,int Blue) {
 
 	Timer_A_initUpModeParam initParam2 = {0};
 //
-	initParam2.clockSource				= TIMER_A_CLOCKSOURCE_SMCLK;
+	initParam2.clockSource				= TIMER_A_CLOCKSOURCE_ACLK;
 	initParam2.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_1;
 	initParam2.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
 	initParam2.captureCompareInterruptEnable_CCR0_CCIE	= TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
-	initParam2.timerPeriod				= 0xFE;
+	initParam2.timerPeriod				= 0xFF;
 	initParam2.timerClear				= TIMER_A_DO_CLEAR;
 	initParam2.startTimer				= false;
 
@@ -48,28 +48,31 @@ void initTimers(int Red,int Green,int Blue) {
 
 //	Timer_A_initContinuousMode(TIMER_A0_BASE,&initParam);
 
-//
-//
+//TIMER_A_OUTPUTMODE_SET_RESET  // fitstatusb
+//TIMER_A_OUTPUTMODE_TOGGLE_SET // ARDUMSP
 
 	// Green
 	Timer_A_initCompareModeParam initCompareParamcc1 = {0};
 	initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
 	initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_SET_RESET;
+//	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
+	initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
 	initCompareParamcc1.compareValue			= Red;
 //
 	// Blue
 	Timer_A_initCompareModeParam initCompareParamcc2 = {0};
 	initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
 	initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_SET_RESET;
+//	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
+    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
 	initCompareParamcc2.compareValue			= Blue;
 
 	// Red
 	Timer_A_initCompareModeParam initCompareParamcc3 = {0};
 	initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
 	initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_SET_RESET;
+//	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
+    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
 	initCompareParamcc3.compareValue			= Green;
 //
 	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -122,13 +125,13 @@ __interrupt void TIMER1_A0_ISR (void)
     switch( __even_in_range( TA0IV, TA0IV_TAIFG )) {
      case TA0IV_NONE: break;                 // (0x00) None
      case TA0IV_TACCR1:                      // (0x02) CCR1 IFG
-         GPIO_toggleOutputOnPin(LED_PORT, LED_G);
+        // GPIO_toggleOutputOnPin(LED_PORT, LED_G);
 //    	 GPIO_toggleOutputOnPin( GPIO_PORT_P6, GPIO_PIN0 );
 //          _no_operation();
            break;
      case TA0IV_TACCR2:                      // (0x04) CCR2 IFG
 //    	 GPIO_setOutputHighOnPin( LED_PORT, LED_R );
-         GPIO_toggleOutputOnPin( LED_PORT, LED_R );
+        // GPIO_toggleOutputOnPin( LED_PORT, LED_R );
 
 //          _no_operation();
            break;
