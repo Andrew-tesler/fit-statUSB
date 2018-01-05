@@ -105,10 +105,62 @@ void initTimers(int Red,int Green,int Blue) {
 // Fade the leds from given color to given color by the time given
 void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, long  time) {
 
+    Timer_B_initUpModeParam initTimer_b = {0};
+
+    initTimer_b.clockSource                             = TIMER_B_CLOCKSOURCE_ACLK;
+    initTimer_b.clockSourceDivider                      = TIMER_B_CLOCKSOURCE_DIVIDER_1;
+    initTimer_b.timerPeriod                             = 32;
+    initTimer_b.timerInterruptEnable_TBIE               = TIMER_B_TBIE_INTERRUPT_DISABLE;
+    initTimer_b.captureCompareInterruptEnable_CCR0_CCIE = TIMER_B_CCIE_CCR0_INTERRUPT_ENABLE;
+    initTimer_b.timerClear                              = TIMER_B_DO_CLEAR;
+    initTimer_b.startTimer                              = false;
+
+    Timer_B_initUpMode(TIMER_B0_BASE, &initTimer_b);
+
+    Timer_B_initCompareModeParam compareB = {0};
+
+    compareB.compareRegister                            = TIMER_B_CAPTURECOMPARE_REGISTER_1;
+    compareB.compareInterruptEnable                     = TIMER_B_CAPTURECOMPARE_INTERRUPT_DISABLE;
+    compareB.compareOutputMode                          = TIMER_A_OUTPUTMODE_TOGGLE;
+    compareB.compareValue                               = 0x01;
+
+    Timer_B_initCompareMode(TIMER_B0_BASE,&compareB);
+
+
+//    Timer_B_initContinuousModeParam initTimer_b = {0};
+//
+//    initTimer_b.clockSource                 = TIMER_B_CLOCKSOURCE_ACLK;
+//    initTimer_b.clockSourceDivider          = TIMER_B_CLOCKSOURCE_DIVIDER_2;
+//    initTimer_b.timerInterruptEnable_TBIE   = TIMER_B_TBIE_INTERRUPT_ENABLE;
+//    initTimer_b.timerClear                  = TIMER_B_DO_CLEAR;
+//    initTimer_b.startTimer                  = false;
+//
+//    Timer_B_initContinuousMode(TIMER_B0_BASE, &initTimer_b);
+//
+    Timer_B_startCounter(TIMER_B0_BASE,TIMER_B_UP_MODE);
+
+
+
+
 }
 //*****************************************************************************
 // Interrupt Service Routine
 //*****************************************************************************
+//
+#pragma vector=TIMER0_B0_VECTOR
+__interrupt void timer_ISRB0 (void) {
+    GPIO_toggleOutputOnPin( LED_PORT, LED_G );
+    Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_0);
+
+}
+//
+#pragma vector=TIMER0_B1_VECTOR
+__interrupt void timer_ISRB1 (void) {
+    GPIO_toggleOutputOnPin( LED_PORT, LED_G );
+    Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_1);
+
+
+}
 
 #pragma vector=TIMER0_A1_VECTOR
 __interrupt void timer_ISR2 (void)

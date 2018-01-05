@@ -250,6 +250,9 @@ void main (void)
                         break;
 
                     case 'B' :
+                        Timer_A_stop(TIMER_A0_BASE);
+                        allOff();
+                        initfade(0,0,0,0,0,0,0);
                         // Set color sequence transition from one color to another issue #8
                         strcpy(outString,"\r\n… Set color sequence\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
