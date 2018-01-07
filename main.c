@@ -49,6 +49,8 @@ targetFlashDetection()
 // ******************************************** INCLUDE ***********************************************
 #include <initBoard.h>                                                                                  // Ti Board specific functions  // TODO remove this or add board specific
 #include <string.h>                                                                                     // String library to handle the String
+#include <stdio.h>                                                                                      /* printf, fgets */
+#include <stdlib.h>                                                                                     //atoi
 #include "driverlib.h"                                                                                  // Ti Driver library for MSP430 Devices
 #include "USB_config/descriptors.h"                                                                     // USB descriptors
 #include "USB_API/USB_Common/device.h"                                                                  // Part of TI USP API library
@@ -58,10 +60,11 @@ targetFlashDetection()
 #include "usbLed.h"                                                                                     // Help functions for the LED's
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project
-#include <stdio.h>
-#include <stdlib.h>
 
+// Test Varibles
+char val;
 
+int ones,tens;
 // ****************************************************************************************************
 
 
@@ -90,7 +93,8 @@ char outString[MAX_STR_LENGTH] = "";                                            
 char deviceSN[128];
 uint16_t count;
 uint16_t c = 0;
-uint16_t tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+
 
 // ****************************************************************************************************
 
@@ -98,7 +102,7 @@ uint16_t tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 // ******************************************** FUNCTION DECLARATION **********************************
 uint8_t retInString (char* string);
 void printHelp(void);
-
+char chrToHx(uint8_t);
 
 // ****************************************************************************************************
 
@@ -233,9 +237,35 @@ void main (void)
 
                         //
                         //
-                        tempR =  wholeString[1] - '0';
-                        tempR2 =  wholeString[2] - '0';
-                        tempR = (tempR2 * 10) + tempR;
+
+                        char buffer[2] = {0x00,0x00};
+                        sprintf(buffer,"%d", wholeString[1]);
+                        ones = atol(buffer);
+                        sprintf(buffer,"%d", wholeString[2]);
+                        tens = atol(buffer);
+
+                        tempR = (tens*10)+ones;
+
+//                        tempR =  wholeString[1] - '0';
+//                        tempR2 =  wholeString[2] - '0';
+//                        tempR = (tempR2 * 10) + tempR;
+
+
+//                        buffer[0] = wholeString[1];
+//                        buffer[1] = wholeString[2];
+
+                        sprintf(buffer,"%d", wholeString[1]);
+                        //
+//                        val = atol(buffer);
+                        //                       val = chrToHx(atoi(buffer));
+
+
+//                       buffer[0] = wholeString[1];
+//                       buffer[1] = wholeString[2];
+
+                       tempR = atol(buffer);
+                       val = chrToHx(atol(buffer));
+
 
                         tempG =  wholeString[3] - '0';
                         tempG2 =  wholeString[4] - '0';
@@ -778,6 +808,33 @@ void printHelp() {
 
 }
 
+
+char chrToHx(uint8_t number) {
+    char formated;
+    switch (number) {
+    case 48:
+        formated=0x00;
+        break;
+    case 49:
+        formated=0x01;
+        break;
+    case 50:
+        formated=0x02;
+        break;
+    case 51:
+        formated=0x03;
+        break;
+    case 52:
+        formated=0x04;
+        break;
+    case 70:
+        formated=0xF;
+
+    }
+
+
+    return formated;
+}
 
 
 //void write_infoB( uint16_t *value, uint16_t *flashLocation )
