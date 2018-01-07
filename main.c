@@ -58,6 +58,8 @@ targetFlashDetection()
 #include "usbLed.h"                                                                                     // Help functions for the LED's
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project
+#include <stdio.h>
+#include <stdlib.h>
 
 
 // ****************************************************************************************************
@@ -88,6 +90,7 @@ char outString[MAX_STR_LENGTH] = "";                                            
 char deviceSN[128];
 uint16_t count;
 uint16_t c = 0;
+uint16_t tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 
 // ****************************************************************************************************
 
@@ -149,7 +152,7 @@ void main (void)
 
     __bis_SR_register( GIE );                                                   // Enable interrupts globally
 
-    int tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+
 
     //c = tempG;
 
@@ -228,6 +231,8 @@ void main (void)
                         GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
 
+                        //
+                        //
                         tempR =  wholeString[1] - '0';
                         tempR2 =  wholeString[2] - '0';
                         tempR = (tempR2 * 10) + tempR;

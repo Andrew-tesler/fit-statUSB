@@ -8,6 +8,9 @@
 #include "myTimers.h"
 #include "defines.c"
 
+int timer = 0;
+int direction = 0;
+
 void initTimers(int Red,int Green,int Blue) {
 
 //
@@ -55,24 +58,24 @@ void initTimers(int Red,int Green,int Blue) {
 	Timer_A_initCompareModeParam initCompareParamcc1 = {0};
 	initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
 	initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
-	initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
+	initCompareParamcc1.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
+//	initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
 	initCompareParamcc1.compareValue			= Red;
 //
 	// Blue
 	Timer_A_initCompareModeParam initCompareParamcc2 = {0};
 	initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
 	initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
-    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
+	initCompareParamcc2.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
+//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
 	initCompareParamcc2.compareValue			= Blue;
 
 	// Red
 	Timer_A_initCompareModeParam initCompareParamcc3 = {0};
 	initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
 	initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
-    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
+	initCompareParamcc3.compareOutputMode		= TIMER_A_OUTPUTMODE_TOGGLE_SET; // ARDUMSP
+//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET; // fitStatusb
 	initCompareParamcc3.compareValue			= Green;
 //
 	Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -109,7 +112,7 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 
     initTimer_b.clockSource                             = TIMER_B_CLOCKSOURCE_ACLK;
     initTimer_b.clockSourceDivider                      = TIMER_B_CLOCKSOURCE_DIVIDER_1;
-    initTimer_b.timerPeriod                             = 32;
+    initTimer_b.timerPeriod                             = 0xFFFF/200;
     initTimer_b.timerInterruptEnable_TBIE               = TIMER_B_TBIE_INTERRUPT_DISABLE;
     initTimer_b.captureCompareInterruptEnable_CCR0_CCIE = TIMER_B_CCIE_CCR0_INTERRUPT_ENABLE;
     initTimer_b.timerClear                              = TIMER_B_DO_CLEAR;
@@ -117,14 +120,14 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 
     Timer_B_initUpMode(TIMER_B0_BASE, &initTimer_b);
 
-    Timer_B_initCompareModeParam compareB = {0};
-
-    compareB.compareRegister                            = TIMER_B_CAPTURECOMPARE_REGISTER_1;
-    compareB.compareInterruptEnable                     = TIMER_B_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    compareB.compareOutputMode                          = TIMER_A_OUTPUTMODE_TOGGLE;
-    compareB.compareValue                               = 0x01;
-
-    Timer_B_initCompareMode(TIMER_B0_BASE,&compareB);
+//    Timer_B_initCompareModeParam compareB = {0};
+//
+//    compareB.compareRegister                            = TIMER_B_CAPTURECOMPARE_REGISTER_1;
+//    compareB.compareInterruptEnable                     = TIMER_B_CAPTURECOMPARE_INTERRUPT_DISABLE;
+//    compareB.compareOutputMode                          = TIMER_A_OUTPUTMODE_TOGGLE;
+//    compareB.compareValue                               = 0xFF;
+//
+//    Timer_B_initCompareMode(TIMER_B0_BASE,&compareB);
 
 
 //    Timer_B_initContinuousModeParam initTimer_b = {0};
@@ -149,14 +152,43 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 //
 #pragma vector=TIMER0_B0_VECTOR
 __interrupt void timer_ISRB0 (void) {
-    GPIO_toggleOutputOnPin( LED_PORT, LED_G );
+
+
+    Timer_A_stop(TIMER_A0_BASE);
+    GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
+    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+
+    initTimers(1,timer,256-timer);
+
+    switch(direction) {
+    case 0:
+
+        if (timer == 255) {
+            direction=1;
+        }
+        else {
+            timer= timer +1 ;;
+        }
+        break;
+    case 1:
+        if (timer == 1) {
+            direction=0;
+        }
+        else {
+            timer = timer -1 ;
+        }
+
+        break;
+    }
+
+//    GPIO_toggleOutputOnPin( LED_PORT, LED_G );
     Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_0);
 
 }
 //
 #pragma vector=TIMER0_B1_VECTOR
 __interrupt void timer_ISRB1 (void) {
-    GPIO_toggleOutputOnPin( LED_PORT, LED_G );
+    //GPIO_toggleOutputOnPin( LED_PORT, LED_G );
     Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_1);
 
 

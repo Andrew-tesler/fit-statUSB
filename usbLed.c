@@ -12,8 +12,8 @@
 
 // For debugging if defined ARDUMSP some of the board GPIO will change direction to correspond with Ardumsp board that is used for initial code implimitation
 
-//#define ARDUMSP
-#define FITSTATUSB
+#define ARDUMSP
+//#define FITSTATUSB
 
 
 /**
