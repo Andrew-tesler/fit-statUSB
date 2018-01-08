@@ -64,7 +64,7 @@ targetFlashDetection()
 // Test Varibles
 char val;
 
-int ones,tens;
+char ones,tens;
 // ****************************************************************************************************
 
 
@@ -93,8 +93,8 @@ char outString[MAX_STR_LENGTH] = "";                                            
 char deviceSN[128];
 uint16_t count;
 uint16_t c = 0;
-char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
-
+unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+char buffer[2] = {0x00,0x00};
 
 // ****************************************************************************************************
 
@@ -183,10 +183,6 @@ void main (void)
         // USB host
         case ST_ENUM_ACTIVE:
 
-
-
-
-
             // Sleep if there are no bytes to process.
             __disable_interrupt();
             if (!USBCDC_getBytesInUSBBuffer(CDC0_INTFNUM)) {
@@ -235,47 +231,35 @@ void main (void)
                         GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
 
-                        //
-                        //
-
-                        char buffer[2] = {0x00,0x00};
+                        // Convert to Hex received Red values
                         sprintf(buffer,"%d", wholeString[1]);
-                        ones = atol(buffer);
+                        tens = chrToHx(atol(buffer));
                         sprintf(buffer,"%d", wholeString[2]);
-                        tens = atol(buffer);
-
-                        tempR = (tens*10)+ones;
-
-//                        tempR =  wholeString[1] - '0';
-//                        tempR2 =  wholeString[2] - '0';
-//                        tempR = (tempR2 * 10) + tempR;
+                        ones = chrToHx(atol(buffer));
 
 
-//                        buffer[0] = wholeString[1];
-//                        buffer[1] = wholeString[2];
+                        tens = (tens << 4);
+                        tempR = tens|ones;
 
-                        sprintf(buffer,"%d", wholeString[1]);
-                        //
-//                        val = atol(buffer);
-                        //                       val = chrToHx(atoi(buffer));
+                        // Convert to HEX received Green values
+                        sprintf(buffer, "%d", wholeString[3]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[4]);
+                        ones = chrToHx(atol(buffer));
 
+                        tens = (tens << 4);
+                        tempG = tens|ones;
 
-//                       buffer[0] = wholeString[1];
-//                       buffer[1] = wholeString[2];
+                        // Convert to HEX received Blue values
+                        sprintf(buffer, "%d", wholeString[5]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[6]);
+                        ones = chrToHx(atol(buffer));
 
-                       tempR = atol(buffer);
-                       val = chrToHx(atol(buffer));
+                        tens = (tens << 4);
+                        tempB = tens|ones;
 
-
-                        tempG =  wholeString[3] - '0';
-                        tempG2 =  wholeString[4] - '0';
-                        tempG = (tempG2 * 10) + tempG;
-
-                        tempB =  wholeString[5] - '0';
-                        tempB2 =  wholeString[6] - '0';
-                        tempB = (tempB2 * 10) + tempB;
-
-
+                        // Send to the fade function
                         initTimers(tempR,tempG,tempB);
 
                         strcpy(outString,"\r\nPressed Fade Command\r\n\r\n");
@@ -827,13 +811,44 @@ char chrToHx(uint8_t number) {
     case 52:
         formated=0x04;
         break;
+    case 53:
+        formated=0x05;
+        break;
+    case 54:
+        formated=0x06;
+        break;
+    case 55:
+        formated=0x07;
+        break;
+    case 56:
+        formated=0x08;
+        break;
+    case 57:
+        formated=0x09;
+        break;
+    case 65:
+        formated=0x0A;
+        break;
+    case 66:
+        formated=0x0B;
+        break;
+    case 67:
+        formated=0x0C;
+        break;
+    case 68:
+        formated=0x0D;
+        break;
+    case 69:
+        formated=0x0E;
+        break;
     case 70:
         formated=0xF;
+        break;
 
     }
-
-
-    return formated;
+//    formated = number - 55;
+return formated;
+   // return formated+0x00;
 }
 
 
