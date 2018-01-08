@@ -792,7 +792,7 @@ void printHelp() {
 
 }
 
-
+// TODO change to more simplified option and add support for lower case string
 char chrToHx(uint8_t number) {
     char formated;
     switch (number) {
