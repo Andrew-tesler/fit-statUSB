@@ -9,18 +9,15 @@
  */
 
 #include "usbLed.h"
+#include "defines.c"
 
 // For debugging if defined ARDUMSP some of the board GPIO will change direction to correspond with Ardumsp board that is used for initial code implimitation
-
-
 
 
 /**
  * turn off all of the LED's
  */
 void allOff() {
-
-
     GPIO_setAsOutputPin(LED_PORT,LED_R);
     GPIO_setAsOutputPin(LED_PORT,LED_G);
     GPIO_setAsOutputPin(LED_PORT,LED_B);
@@ -59,7 +56,6 @@ void allOn() {
 
 void ledOn(char led) {
     allOff();                                                       // Initially turn off all of the LEDs
-
 
     switch(led) {
     case 'R' :

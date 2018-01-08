@@ -139,8 +139,9 @@ void USBHAL_initPorts(void)
 
 
     GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
-    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-
+//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+    GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
+//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
 
 }
 
