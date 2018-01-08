@@ -6,6 +6,9 @@
  *      Global defines file
  */
 
+//#define ARDUMSP
+#define FITSTATUSB
+
 
 
 #define LED_PORT	GPIO_PORT_P1
