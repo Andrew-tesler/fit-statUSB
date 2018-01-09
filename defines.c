@@ -8,8 +8,9 @@
 
 
 
-#define ARDUMSP
-//#define FITSTATUSB
+
+//#define ARDUMSP
+#define FITSTATUSB
 
 
 
