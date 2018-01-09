@@ -13,7 +13,7 @@ int direction = 0;                                                              
 
 uint16_t fadeTime = 10000;                                                      // Fade time between each fade intervals TODO Will need to use with color differential number
 uint16_t fadeTick = 0;                                                          // Fade tick - each tick counter that reaches global the LED fade should increment
-uint16_t fadeTickGlobal=10;                                                   // Global value for the tick to increment
+uint16_t fadeTickGlobal=1;                                                   // Global value for the tick to increment
 
 void initTimers(int Red,int Green,int Blue) {
 
@@ -140,8 +140,9 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 __interrupt void timer_ISRB0 (void) {
 
     Timer_A_stop(TIMER_A0_BASE);
-    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
     initTimers(0x04,timer,0x01);
+
 
 
 
@@ -180,7 +181,7 @@ __interrupt void timer_ISRB0 (void) {
 //    // Direction -- Direction of fade time 0 - UP
 //    //                                     1 - Down
 //
-    fadeTickGlobal = fadeTime/255;                                                  // TODO the 255 number will have to be the color diference of each led
+//    fadeTickGlobal = fadeTime/255;                                                  // TODO the 255 number will have to be the color diference of each led
 
     if (fadeTick <= fadeTickGlobal) {                                               // If the fade tick smaller that the calculted global
         //
@@ -208,10 +209,10 @@ __interrupt void timer_ISRB0 (void) {
         }
     }
 ////    // FasdeTick havent reached incriment the counter
-//    else {
-//        fadeTick=0;
-////
-//    }
+    else {
+        fadeTick=0;
+//
+    }
 //
 //                                                                 // Update the timer
 

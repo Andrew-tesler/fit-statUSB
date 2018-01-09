@@ -215,9 +215,9 @@ void main (void)
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
-                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
+                        //ledOn(wholeString[1]);                                                          // Function to set the LEDs
 
-                        strcpy(outString,"\r\nLED is ON\r\n\r\n");                                      // Prepare String for Console print
+                        strcpy(outString,"\r\nLED is ON--Suspended function\r\n\r\n");                                      // Prepare String for Console print
 
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);                  // Send the String to USB Console
@@ -292,6 +292,7 @@ void main (void)
                         // Set fading (transition) period in ms
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
                         initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,

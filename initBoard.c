@@ -52,7 +52,7 @@
 
 
 #define GPIO_ALL	GPIO_PIN0|GPIO_PIN1|GPIO_PIN2|GPIO_PIN3| \
-					GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
+        GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
 
 uint32_t myACLK;
 uint32_t mySMCLK;
@@ -60,13 +60,13 @@ uint32_t myMCLK;
 
 
 /*
-* This function drives all the I/O's as output-low, to avoid floating inputs
-* (which cause extra power to be consumed).  This setting is compatible with  
+ * This function drives all the I/O's as output-low, to avoid floating inputs
+ * (which cause extra power to be consumed).  This setting is compatible with
  * TI FET target boards, the F5529 Launchpad, and F5529 Experimenters Board;  
  * but may not be compatible with custom hardware, which may have components  
  * attached to the I/Os that could be affected by these settings.  So if using
-* other boards, this function may need to be modified.
-*/
+ * other boards, this function may need to be modified.
+ */
 void USBHAL_initPorts(void)
 {
 #ifdef __MSP430_HAS_PORT1_R__
@@ -121,27 +121,27 @@ void USBHAL_initPorts(void)
 #endif
 
     GPIO_setOutputHighOnPin(LED_PORT,LED_R + LED_G + LED_B);
-//    // Porn down the LEDs on SPI CLONE board will need to be deleted in the functional version
-//    // Status 1
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P4,GPIO_PIN7);
-//    // Status 2
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN0);
-//    // Status 3
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN4);
-//    // Status 4
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN5);
-//    // Status 5
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P6,GPIO_PIN2);
-//    // DETECT PINS
-//    GPIO_setOutputHighOnPin(GPIO_PORT_P1,GPIO_ALL);
+    //    // Porn down the LEDs on SPI CLONE board will need to be deleted in the functional version
+    //    // Status 1
+    //    GPIO_setOutputHighOnPin(GPIO_PORT_P4,GPIO_PIN7);
+    //    // Status 2
+    //    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN0);
+    //    // Status 3
+    //    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN4);
+    //    // Status 4
+    //    GPIO_setOutputHighOnPin(GPIO_PORT_P5,GPIO_PIN5);
+    //    // Status 5
+    //    GPIO_setOutputHighOnPin(GPIO_PORT_P6,GPIO_PIN2);
+    //    // DETECT PINS
+    //    GPIO_setOutputHighOnPin(GPIO_PORT_P1,GPIO_ALL);
 
 
 
 
     GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
-//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+    //    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
     GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
-//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+    //    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
 
 }
 
@@ -161,16 +161,16 @@ void USBHAL_initClocks(uint32_t mclkFreq)
     UCS_turnOnXT2( UCS_XT2_DRIVE_8MHZ_16MHZ );
 
     UCS_setExternalClockSource(
-                LF_CRYSTAL_FREQUENCY_IN_HZ,                                         // XT1CLK input
-                HF_CRYSTAL_FREQUENCY_IN_HZ                                          // XT2CLK input
-        );
+            LF_CRYSTAL_FREQUENCY_IN_HZ,                                         // XT1CLK input
+            HF_CRYSTAL_FREQUENCY_IN_HZ                                          // XT2CLK input
+    );
 
 
 
-	UCS_initClockSignal(
-	   UCS_FLLREF,
-	   UCS_REFOCLK_SELECT,
-	   UCS_CLOCK_DIVIDER_1);
+    UCS_initClockSignal(
+            UCS_FLLREF,
+            UCS_REFOCLK_SELECT,
+            UCS_CLOCK_DIVIDER_1);
 
     // Select XT2 as oscillator source for SMCLK
     UCS_initClockSignal(
@@ -179,20 +179,20 @@ void USBHAL_initClocks(uint32_t mclkFreq)
             UCS_CLOCK_DIVIDER_1                          // Divide down clock source by this much
     );
     UCS_initClockSignal(
-               UCS_MCLK,
-               UCS_XT2CLK_SELECT,
-               UCS_CLOCK_DIVIDER_1
-       );
+            UCS_MCLK,
+            UCS_XT2CLK_SELECT,
+            UCS_CLOCK_DIVIDER_1
+    );
 
 
-	UCS_initClockSignal(
-	   UCS_ACLK,
-	   UCS_REFOCLK_SELECT,
-	   UCS_CLOCK_DIVIDER_1);
+    UCS_initClockSignal(
+            UCS_ACLK,
+            UCS_REFOCLK_SELECT,
+            UCS_CLOCK_DIVIDER_1);
 
     UCS_initFLLSettle(
-        mclkFreq/1000,
-        mclkFreq/32768);
+            mclkFreq/1000,
+            mclkFreq/32768);
 
 
 }
