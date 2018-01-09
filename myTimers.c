@@ -8,12 +8,12 @@
 #include "myTimers.h"
 #include "defines.c"
 
-uint8_t timer = 0x00;
+char timer = 0x00;
 int direction = 0;                                                              // Direction of the fade
 
 uint16_t fadeTime = 10000;                                                      // Fade time between each fade intervals TODO Will need to use with color differential number
 uint16_t fadeTick = 0;                                                          // Fade tick - each tick counter that reaches global the LED fade should increment
-uint16_t fadeTickGlobal=1;                                                   // Global value for the tick to increment
+uint16_t fadeTickGlobal=10;                                                   // Global value for the tick to increment
 
 void initTimers(int Red,int Green,int Blue) {
 
@@ -34,7 +34,7 @@ void initTimers(int Red,int Green,int Blue) {
 
     Timer_A_initUpModeParam initParam2 = {0};
     //
-    initParam2.clockSource				= TIMER_A_CLOCKSOURCE_ACLK;
+    initParam2.clockSource				= TIMER_A_CLOCKSOURCE_SMCLK;
     initParam2.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_1;
     initParam2.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
     initParam2.captureCompareInterruptEnable_CCR0_CCIE	= TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
@@ -116,9 +116,9 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 
     Timer_B_initUpModeParam initTimer_b = {0};
 //    0xDCD;
-    initTimer_b.clockSource                             = TIMER_B_CLOCKSOURCE_ACLK;
-    initTimer_b.clockSourceDivider                      = TIMER_B_CLOCKSOURCE_DIVIDER_1;
-    initTimer_b.timerPeriod                             = 0xFFFF / 2;
+    initTimer_b.clockSource                             = TIMER_B_CLOCKSOURCE_SMCLK;
+    initTimer_b.clockSourceDivider                      = TIMER_B_CLOCKSOURCE_DIVIDER_16;
+    initTimer_b.timerPeriod                             = 0xFFFF;
     initTimer_b.timerInterruptEnable_TBIE               = TIMER_B_TBIE_INTERRUPT_DISABLE;
     initTimer_b.captureCompareInterruptEnable_CCR0_CCIE = TIMER_B_CCIE_CCR0_INTERRUPT_ENABLE;
     initTimer_b.timerClear                              = TIMER_B_DO_CLEAR;
@@ -139,9 +139,12 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 #pragma vector=TIMER0_B0_VECTOR
 __interrupt void timer_ISRB0 (void) {
 
+
     Timer_A_stop(TIMER_A0_BASE);
-//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
-    initTimers(0x04,timer,0x01);
+    //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+    initTimers(0x00,0x00,timer);
+
+    timer++;
 
 
 
@@ -182,37 +185,37 @@ __interrupt void timer_ISRB0 (void) {
 //    //                                     1 - Down
 //
 //    fadeTickGlobal = fadeTime/255;                                                  // TODO the 255 number will have to be the color diference of each led
-
-    if (fadeTick <= fadeTickGlobal) {                                               // If the fade tick smaller that the calculted global
-        //
-        fadeTick++;
-        switch(direction) {
-        // Counting UP
-        case 0:
-            if (timer<255) {
-                timer++;
-            }
-            else {
-                direction=1;
-            }
-            break;
-            // Counting Down
-        case 1:
-            if (timer>0) {
-                timer--;
-            }
-            else {
-                direction=0;
-            }
-
-            break;
-        }
-    }
-////    // FasdeTick havent reached incriment the counter
-    else {
-        fadeTick=0;
 //
-    }
+//    if (fadeTick <= fadeTickGlobal) {                                               // If the fade tick smaller that the calculted global
+//        //
+//        fadeTick++;
+//        switch(direction) {
+//        // Counting UP
+//        case 0:
+//            if (timer<255) {
+//                timer++;
+//            }
+//            else {
+//                direction=1;
+//            }
+//            break;
+//            // Counting Down
+//        case 1:
+//            if (timer>0) {
+//                timer--;
+//            }
+//            else {
+//                direction=0;
+//            }
+//
+//            break;
+//        }
+//    }
+//////    // FasdeTick havent reached incriment the counter
+//    else {
+//        fadeTick=0;
+////
+//    }
 //
 //                                                                 // Update the timer
 
