@@ -61,6 +61,7 @@ targetFlashDetection()
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project
 
+
 // Test Varibles
 char val;
 
@@ -96,6 +97,11 @@ uint16_t c = 0;
 unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 char buffer[2] = {0x00,0x00};
 
+uint32_t timetoFade =300;                                                                               // Value for the LED's to fade
+uint8_t timeBuffer[6] = {0,0,0,0,0,0};
+uint32_t maxTimeToFade = 100000;
+
+int i=1;
 // ****************************************************************************************************
 
 
@@ -289,6 +295,28 @@ void main (void)
                         // Set fading (transition) period in ms
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
+                        // Find the Decimal number to fade in the Buffer
+                        timetoFade=0;
+                        maxTimeToFade = 100000;
+                        // Max 6 Digits
+                        for (i=0;i < 10 ; i++) {
+                            if (wholeString[i+1] >= '0' && wholeString[i+1] <= '9') {
+                                timetoFade = timetoFade + chrToHx(wholeString[i+1])*(maxTimeToFade);
+                                maxTimeToFade = maxTimeToFade / 10;
+                            }
+//                            else {
+//                                timetoFade = timetoFade/10;
+//                            }
+
+//                            if ( chrToHx(wholeString[i+1]) > 0x00 & chrToHx(wholeString[i+1]) <= 9 ) {
+//                                timeBuffer[i] = chrToHx(wholeString[i+1]);    // Dtore the values in the buffer
+//                            }
+//                            timetoFade = timetoFade + timeBuffer[i]*(maxTimeToFade);
+//                            maxTimeToFade = maxTimeToFade/10;
+//
+                        }
+
+
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
                         initFadeTime(300);
 //                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
@@ -680,6 +708,7 @@ char chrToHx(uint8_t number) {
 return formated;
    // return formated+0x00;
 }
+
 
 
 //void write_infoB( uint16_t *value, uint16_t *flashLocation )
