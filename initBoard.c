@@ -51,8 +51,8 @@
 
 
 
-#define GPIO_ALL	GPIO_PIN0|GPIO_PIN1|GPIO_PIN2|GPIO_PIN3| \
-        GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
+//#define GPIO_ALL	GPIO_PIN0|GPIO_PIN1|GPIO_PIN2|GPIO_PIN3| \
+//        GPIO_PIN4|GPIO_PIN5|GPIO_PIN6|GPIO_PIN7
 
 uint32_t myACLK;
 uint32_t mySMCLK;
@@ -70,6 +70,7 @@ uint32_t myMCLK;
 void USBHAL_initPorts(void)
 {
 #ifdef __MSP430_HAS_PORT1_R__
+
     GPIO_setOutputLowOnPin(GPIO_PORT_P1, GPIO_ALL);
     GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_ALL);
 
@@ -120,7 +121,12 @@ void USBHAL_initPorts(void)
     GPIO_setAsOutputPin(GPIO_PORT_PJ, GPIO_ALL);
 #endif
 
-    GPIO_setOutputHighOnPin(LED_PORT,LED_R + LED_G + LED_B);
+    GPIO_setOutputHighOnPin(GPIO_PORT_P1, GPIO_ALL);
+    GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_ALL);
+
+    GPIO_setOutputHighOnPin(GPIO_PORT_P2, GPIO_ALL);
+    GPIO_setAsOutputPin(GPIO_PORT_P2, GPIO_ALL);
+    //GPIO_setOutputHighOnPin(LED_PORT,LED_R + LED_G + LED_B);
     //    // Porn down the LEDs on SPI CLONE board will need to be deleted in the functional version
     //    // Status 1
     //    GPIO_setOutputHighOnPin(GPIO_PORT_P4,GPIO_PIN7);
@@ -134,13 +140,16 @@ void USBHAL_initPorts(void)
     //    GPIO_setOutputHighOnPin(GPIO_PORT_P6,GPIO_PIN2);
     //    // DETECT PINS
     //    GPIO_setOutputHighOnPin(GPIO_PORT_P1,GPIO_ALL);
+//GPIO_setAsOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+//GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
+//
+//GPIO_setOutputHighOnPin(LED_PORT,LED_R + LED_G + LED_B);
+
+//GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);
 
 
-
-
-    GPIO_setDriveStrength(LED_PORT,LED_R + LED_G + LED_B,GPIO_FULL_OUTPUT_DRIVE_STRENGTH);
     //    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-    GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
+    //GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
     //    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
 
 }

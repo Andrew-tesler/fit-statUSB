@@ -214,8 +214,8 @@ void main (void)
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
-                        //ledOn(wholeString[1]);                                                          // Function to set the LEDs
-
+                        allOff();
+//                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
                         strcpy(outString,"\r\nLED is ON--Suspended function\r\n\r\n");                                      // Prepare String for Console print
 
                         USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -225,9 +225,7 @@ void main (void)
                     case '#' :                                                                          // Set Led color #RRGGBB
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
-//                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
-
                         // Convert to Hex received Red values
                         sprintf(buffer,"%d", wholeString[1]);
                         tens = chrToHx(atol(buffer));
@@ -292,7 +290,7 @@ void main (void)
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-                        initFadeTime(5000);
+                        initFadeTime(300);
 //                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
