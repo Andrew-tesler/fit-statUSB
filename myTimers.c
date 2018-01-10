@@ -14,7 +14,7 @@ int direction = 0;                                                              
 
 
 uint16_t fadeTick = 0;              // Fade tick - Temp Value for the timer function, Each clock increment increments this value
-uint16_t fadeTickGlobal=3000;       // fadeTickGlobal - Global time from color transition from one color to another in ms
+uint16_t fadeTickGlobal=5000;       // fadeTickGlobal - Global time from color transition from one color to another in ms
 uint16_t fadeTime = 0;              // Fade time - calculated value from the global time needed and the steps to transition
 uint8_t fadeColorStep = 255;          // Steps for transition to the next desired color
                                                                                         // Fade time between each fade intervals TODO Will need to use with color differential number
@@ -155,7 +155,7 @@ __interrupt void timer_ISRB0 (void) {
 
     Timer_A_stop(TIMER_A0_BASE);
     //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
-    initTimers(0x00,0x00,timer);
+    initTimers(0x01,0x01,timer);
 
 
 //

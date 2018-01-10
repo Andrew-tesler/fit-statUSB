@@ -293,7 +293,7 @@ void main (void)
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-                        initFadeTime(1000);
+                        initFadeTime(5000);
 //                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
