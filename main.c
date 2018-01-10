@@ -49,6 +49,8 @@ targetFlashDetection()
 // ******************************************** INCLUDE ***********************************************
 #include <initBoard.h>                                                                                  // Ti Board specific functions  // TODO remove this or add board specific
 #include <string.h>                                                                                     // String library to handle the String
+#include <stdio.h>                                                                                      /* printf, fgets */
+#include <stdlib.h>                                                                                     //atoi
 #include "driverlib.h"                                                                                  // Ti Driver library for MSP430 Devices
 #include "USB_config/descriptors.h"                                                                     // USB descriptors
 #include "USB_API/USB_Common/device.h"                                                                  // Part of TI USP API library
@@ -59,7 +61,10 @@ targetFlashDetection()
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project
 
+// Test Varibles
+char val;
 
+char ones,tens;
 // ****************************************************************************************************
 
 
@@ -88,6 +93,8 @@ char outString[MAX_STR_LENGTH] = "";                                            
 char deviceSN[128];
 uint16_t count;
 uint16_t c = 0;
+unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+char buffer[2] = {0x00,0x00};
 
 // ****************************************************************************************************
 
@@ -95,7 +102,7 @@ uint16_t c = 0;
 // ******************************************** FUNCTION DECLARATION **********************************
 uint8_t retInString (char* string);
 void printHelp(void);
-
+char chrToHx(uint8_t);
 
 // ****************************************************************************************************
 
@@ -106,7 +113,6 @@ void printHelp(void);
 // Revision information from Flash
 char *MAJOR1_ptrB = (char *)INFOB_START;                                                                // Major Revision Start
 char *MINOR1_ptrB = (char *)INFOB_START+2;                                                              // Minor Revision start
-
 char *SERIAL_ptrB = (char *)INFOB_START+4;                                                              // Serial Number Start
 
 // ****************************************************************************************************
@@ -127,13 +133,13 @@ void main (void)
 {
     WDT_A_hold(WDT_A_BASE);                                                                             // Stop watchdog timer
     PMM_setVCore(PMM_CORE_LEVEL_3);                                                                     // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
+// REFTCOFF 0   REF Temp.Sensor off
 
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)
     USBHAL_initClocks(12000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
     USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
     // Initialize timers
-
 
     // Collect all the Device information in to one string
     strcat(deviceSN,"REV:");
@@ -148,11 +154,6 @@ void main (void)
 
     __bis_SR_register( GIE );                                                   // Enable interrupts globally
 
-    int tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
-
-    //c = tempG;
-
-    initTimers(0,25,0);
 
     __enable_interrupt();  // Enable interrupts globally
 
@@ -174,8 +175,6 @@ void main (void)
         // This case is executed while your device is enumerated on the
         // USB host
         case ST_ENUM_ACTIVE:
-
-
 
 
 
@@ -214,17 +213,53 @@ void main (void)
 
                     switch(wholeString[0]) {
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
-                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        //ledOn(wholeString[1]);                                                          // Function to set the LEDs
 
-                        strcpy(outString,"\r\nLED is ON\r\n\r\n");                                      // Prepare String for Console print
+                        strcpy(outString,"\r\nLED is ON--Suspended function\r\n\r\n");                                      // Prepare String for Console print
 
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);                  // Send the String to USB Console
                         break;
 
                     case '#' :                                                                          // Set Led color #RRGGBB
-                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+//                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+
+                        // Convert to Hex received Red values
+                        sprintf(buffer,"%d", wholeString[1]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[2]);
+                        ones = chrToHx(atol(buffer));
+
+
+                        tens = (tens << 4);
+                        tempR = tens|ones;
+
+                        // Convert to HEX received Green values
+                        sprintf(buffer, "%d", wholeString[3]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[4]);
+                        ones = chrToHx(atol(buffer));
+
+                        tens = (tens << 4);
+                        tempG = tens|ones;
+
+                        // Convert to HEX received Blue values
+                        sprintf(buffer, "%d", wholeString[5]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[6]);
+                        ones = chrToHx(atol(buffer));
+
+                        tens = (tens << 4);
+                        tempB = tens|ones;
+
+                        // Send to the fade function
+                        initTimers(tempR,tempG,tempB);
+
                         strcpy(outString,"\r\nPressed Fade Command\r\n\r\n");
                         // Send the String to USB
                         USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -232,6 +267,11 @@ void main (void)
                         break;
 
                     case 'B' :
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+                        allOff();
+                        initfade(0,0,0,0,0,0,0);
                         // Set color sequence transition from one color to another issue #8
                         strcpy(outString,"\r\n… Set color sequence\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -251,7 +291,10 @@ void main (void)
                     case 'F':
                         // Set fading (transition) period in ms
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
-
+                        Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+                        initFadeTime(5000);
+//                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
@@ -275,6 +318,8 @@ void main (void)
                             // Send String here the USB will kill itself next
                             USBCDC_sendDataInBackground((uint8_t*)outString,
                                                         strlen(outString),CDC0_INTFNUM,0);
+                            Timer_B_stop(TIMER_B0_BASE);
+                            Timer_A_stop(TIMER_A0_BASE);
                             // Programming mode
                             USB_disconnect();                           // Disconnect USB device
                             __disable_interrupt();                      // Disable global interrupt
@@ -309,178 +354,6 @@ void main (void)
                                                     strlen(outString),CDC0_INTFNUM,0);
                         break;
                     }
-/*
-                    //					// Compare to string #1, and respond
-                    //					if (!(strcmp(wholeString, "b on"))){
-                    //					    ledOn('B');
-                    //					    //GPIO_setOutputLowOnPin(LED_PORT,LED_R);
-                    ////					    GPIO_setOutputLowOnPin(LED_PORT,LED_B);
-                    ////						initTimers(0,0,128);
-                    //
-                    //					    // Prepare the outgoing string
-                    //					    strcpy(outString,"\r\nBlue is ON\r\n\r\n");
-                    //
-                    //					    // Send the response over USB
-                    //					    USBCDC_sendDataInBackground((uint8_t*)outString,
-                    //					                                strlen(outString),CDC0_INTFNUM,0);
-                    //
-                    //					    // Compare to string #2, and respond
-                    //					} else if (!(strcmp(wholeString, "b off"))){
-                    //
-                    //					    //						initTimers(0,0,0);
-                    //
-                    //					    //GPIO_setOutputHighOnPin(LED_PORT,LED_R);
-                    //					    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
-                    //
-                    //					    // Prepare the outgoing string
-                    //					    strcpy(outString,"\r\nBlue is OFF\r\n\r\n");
-                    //
-                    //					    // Send the response over USB
-                    //					    USBCDC_sendDataInBackground((uint8_t*)outString,
-                    //					                                strlen(outString),CDC0_INTFNUM,0);
-                    //
-                    //
-                    //					} else if (!(strcmp(wholeString, "r on"))){
-                    //
-                    //					    ledOn('R');
-                    ////					    GPIO_setAsOutputPin(LED_PORT,LED_R);
-                    ////					    GPIO_setOutputLowOnPin(LED_PORT,LED_R);
-                    //						//initTimers(128,0,0);
-                    //						// Prepare the outgoing string
-                    //						strcpy(outString,"\r\nRed is On\r\n\r\n");
-                    //
-                    //						// Send the response over USB
-                    //						USBCDC_sendDataInBackground((uint8_t*)outString,
-                    //								strlen(outString),CDC0_INTFNUM,0);
-                    //					} else if (!(strcmp(wholeString, "r off"))){
-                    //
-                    //					    GPIO_setAsInputPin(LED_PORT,LED_R);
-                    //					    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
-                    ////						initTimers(0,0,0);
-                    //
-                    //						// Prepare the outgoing string
-                    //						strcpy(outString,"\r\nRed is Off\r\n\r\n");
-                    //
-                    //						// Send the response over USB
-                    //						USBCDC_sendDataInBackground((uint8_t*)outString,
-                    //								strlen(outString),CDC0_INTFNUM,0);
-                    //
-                    //					} else if (!(strcmp(wholeString, "g on"))){
-                    ////					    GPIO_setOutputLowOnPin(LED_PORT,LED_G);
-                    ////						initTimers(0,128,0);
-                    //					    ledOn('G');
-                    //						// Prepare the outgoing string
-                    //						strcpy(outString,"\r\nGreen is On\r\n\r\n");
-                    //
-                    //						// Send the response over USB
-                    //						USBCDC_sendDataInBackground((uint8_t*)outString,
-                    //								strlen(outString),CDC0_INTFNUM,0);
-                    //
-                    //					} else if (!(strcmp(wholeString, "g off"))){
-                    //					    GPIO_setOutputHighOnPin(LED_PORT,LED_G);
-                    ////						initTimers(0,0,0);
-                    //
-                    //						// Prepare the outgoing string
-                    //						strcpy(outString,"\r\nGreen is Off\r\n\r\n");
-                    //
-                    //						// Send the response over USB
-                    //						USBCDC_sendDataInBackground((uint8_t*)outString,
-                    //								strlen(outString),CDC0_INTFNUM,0);
-                    //
-                    //						// Compare to string #3, and respond
-                    //	}
-                    if (!(strcmp(wholeString, "-v"))){
-
-                        //strcat(deviceSN,"56987\t Rev.1.0\n\n\r");
-                        // Print device SN
-                        USBCDC_sendDataInBackground((uint8_t*)deviceSN,
-                                                    strlen(deviceSN),CDC0_INTFNUM,0);
-
-                        // Compare string and respond
-                        //				} else if (!(strcmp(wholeString, "-h"))){
-                        //
-                        //				    // Print help screen
-                        //				    printHelp();
-
-                    } else if (wholeString[0] == '#'){
-                        // Test Function for Fade in amd out the leds
-
-                        // Turn off timer while changing toggle period
-                        Timer_A_stop(TIMER_A0_BASE);
-
-                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);
-                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-
-                        tempR =  wholeString[1] - '0';
-                        tempR2 =  wholeString[2] - '0';
-                        tempR = (tempR2 * 10) + tempR;
-
-                        tempG =  wholeString[3] - '0';
-                        tempG2 =  wholeString[4] - '0';
-                        tempG = (tempG2 * 10) + tempG;
-
-                        tempB =  wholeString[5] - '0';
-                        tempB2 =  wholeString[6] - '0';
-                        tempB = (tempB2 * 10) + tempB;
-
-
-                        initTimers(tempR,tempG,tempB);
-
-
-
-                        //						dof
-                        //						FlashCtl eraseSegment(FlashCtl BASE,
-                        //						(unsigned char *)INFOD START
-                        //						);
-                        //						status = FlashCtl performEraseCheck(FlashCtl BASE,
-                        //						(unsigned char *)INFOD START,
-                        //						128
-                        //						);
-                        //						gwhile(status == STATUS FAIL);
-                        //						//Flash write
-                        //						FlashCtl write32(FlashCtl BASE,
-                        //						calibration data,
-                        //						(unsigned long *)(INFOD START),1);
-
-
-                        //GPIO_toggleOutputOnPin(LED_PORT,LED_G);
-                        // Prepare the outgoing string
-                        strcpy(outString,
-                               "\r\nColor Changed\n\n\r");
-
-
-                        // Send the response over USB
-                        USBCDC_sendDataInBackground((uint8_t*)outString,
-                                                    strlen(outString),CDC0_INTFNUM,0);
-
-
-
-
-                        // Compare to string #4, and respond
-
-                    } else if (!(strcmp(wholeString, "prog"))){
-                        //	Enter Bsl mode (Will reset the USB)
-
-                        USB_disconnect();							// Disconnect USB device
-                        __disable_interrupt();						// Disable global interrupt
-                        ((void (*)())0x1000)();						// Set the bsl address
-                        USB_connect();								// Connect the USB back on
-
-
-
-                        // Compare to string #4, and respond
-
-
-                    } else {
-
-                        // Prepare the outgoing string
-                        strcpy(outString,"\r\nNo such command!\r\n\r\n");
-
-                        // Send the response over USB
-                        USBCDC_sendDataInBackground((uint8_t*)outString,
-                                                    strlen(outString),CDC0_INTFNUM,0);
-                    }
-                    */
 
                     // Clear the string in preparation for the next one
                     for (i = 0; i < MAX_STR_LENGTH; i++){
@@ -752,6 +625,64 @@ void printHelp() {
 
 }
 
+// TODO change to more simplified option and add support for lower case string
+char chrToHx(uint8_t number) {
+    char formated;
+    switch (number) {
+    case 48:
+        formated=0x00;
+        break;
+    case 49:
+        formated=0x01;
+        break;
+    case 50:
+        formated=0x02;
+        break;
+    case 51:
+        formated=0x03;
+        break;
+    case 52:
+        formated=0x04;
+        break;
+    case 53:
+        formated=0x05;
+        break;
+    case 54:
+        formated=0x06;
+        break;
+    case 55:
+        formated=0x07;
+        break;
+    case 56:
+        formated=0x08;
+        break;
+    case 57:
+        formated=0x09;
+        break;
+    case 65:
+        formated=0x0A;
+        break;
+    case 66:
+        formated=0x0B;
+        break;
+    case 67:
+        formated=0x0C;
+        break;
+    case 68:
+        formated=0x0D;
+        break;
+    case 69:
+        formated=0x0E;
+        break;
+    case 70:
+        formated=0xF;
+        break;
+
+    }
+//    formated = number - 55;
+return formated;
+   // return formated+0x00;
+}
 
 
 //void write_infoB( uint16_t *value, uint16_t *flashLocation )
