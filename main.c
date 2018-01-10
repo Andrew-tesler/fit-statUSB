@@ -151,7 +151,6 @@ void main (void)
     strcat(deviceSN,"\r\n\r\n");
 
 
-
     __bis_SR_register( GIE );                                                   // Enable interrupts globally
 
 
