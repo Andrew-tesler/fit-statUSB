@@ -97,11 +97,14 @@ uint16_t c = 0;
 unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 char buffer[2] = {0x00,0x00};
 
-uint32_t timetoFade =300;                                                                               // Value for the LED's to fade
-uint8_t timeBuffer[6] = {0,0,0,0,0,0};
-uint32_t maxTimeToFade = 100000;
+// values time fade function
+uint32_t timetoFade =300;                                                                               // Default value for time to fade
+uint8_t timeBuffer[6] = {0,0,0,0,0,0};                                                                  // Buffer to store The decimal numbers from user input
+uint32_t maxTimeToFade = 100000;                                                                        // Maximum Number to fade TODO try to remove this
+uint8_t fadeCounter = 0;                                                                                // Counter for array size
 
 int i=1;
+int n = 0;
 // ****************************************************************************************************
 
 
@@ -296,30 +299,25 @@ void main (void)
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
                         // Find the Decimal number to fade in the Buffer
-                        timetoFade=0;
-                        maxTimeToFade = 100000;
+                        timetoFade=0;                                                                   // Initialize time to fade value
+                        maxTimeToFade = 1;                                                              // Initialize Max time to fade
+                        fadeCounter=0;                                                                  // Initialize fade counter
                         // Max 6 Digits
-                        for (i=0;i < 10 ; i++) {
+                        for (i=0;i <= 6 ; i++) {                                                        // For loop that extract decimals from user input
                             if (wholeString[i+1] >= '0' && wholeString[i+1] <= '9') {
-                                timetoFade = timetoFade + chrToHx(wholeString[i+1])*(maxTimeToFade);
-                                maxTimeToFade = maxTimeToFade / 10;
+                                fadeCounter++;                                                          // Increment counter to be used in the next for loop
+                                timeBuffer[i] = chrToHx(wholeString[i+1]);                              // Store to buffer the converted decimal number
+                                maxTimeToFade = maxTimeToFade*10;                                       // Increment the max time to fade decimal places
                             }
-//                            else {
-//                                timetoFade = timetoFade/10;
-//                            }
-
-//                            if ( chrToHx(wholeString[i+1]) > 0x00 & chrToHx(wholeString[i+1]) <= 9 ) {
-//                                timeBuffer[i] = chrToHx(wholeString[i+1]);    // Dtore the values in the buffer
-//                            }
-//                            timetoFade = timetoFade + timeBuffer[i]*(maxTimeToFade);
-//                            maxTimeToFade = maxTimeToFade/10;
-//
+                        }
+                        for (i = 0 ; i <= fadeCounter ; i++ ) {                                         // For loop that calculate the time fade value and store it
+                            maxTimeToFade = maxTimeToFade/10;                                           // Multiply the timer digits
+                            timetoFade = timetoFade + (timeBuffer[i]*maxTimeToFade);
                         }
 
-
-                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-                        initFadeTime(300);
-//                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
+                        GPIO_setAsInputPin(LED_PORT, LED_R);                                            // TODO disabled Red LED for debuging
+                        initFadeTime(timetoFade);
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
