@@ -61,6 +61,7 @@ targetFlashDetection()
 #include "myTimers.h"                                                                                   // Timer specific functions
 #include "defines.c"                                                                                    // Global defines for the whole project
 
+
 // Test Varibles
 char val;
 
@@ -96,6 +97,14 @@ uint16_t c = 0;
 unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
 char buffer[2] = {0x00,0x00};
 
+// values time fade function
+uint32_t timetoFade =300;                                                                               // Default value for time to fade
+uint8_t timeBuffer[6] = {0,0,0,0,0,0};                                                                  // Buffer to store The decimal numbers from user input
+uint32_t maxTimeToFade = 100000;                                                                        // Maximum Number to fade TODO try to remove this
+uint8_t fadeCounter = 0;                                                                                // Counter for array size
+
+int i=1;
+int n = 0;
 // ****************************************************************************************************
 
 
@@ -214,8 +223,8 @@ void main (void)
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
-                        //ledOn(wholeString[1]);                                                          // Function to set the LEDs
-
+                        allOff();
+//                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
                         strcpy(outString,"\r\nLED is ON--Suspended function\r\n\r\n");                                      // Prepare String for Console print
 
                         USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -225,9 +234,7 @@ void main (void)
                     case '#' :                                                                          // Set Led color #RRGGBB
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
-//                        GPIO_setAsInputPin(LED_PORT,LED_R + LED_G + LED_B);                             // TODO Check if this is part of the alternative GPIO function
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
-
                         // Convert to Hex received Red values
                         sprintf(buffer,"%d", wholeString[1]);
                         tens = chrToHx(atol(buffer));
@@ -291,9 +298,26 @@ void main (void)
                         // Set fading (transition) period in ms
                         // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
-                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-                        initFadeTime(5000);
-//                        initfade(0,0,0,0,0,0,1000);                                                     // Inint the fade command
+                        // Find the Decimal number to fade in the Buffer
+                        timetoFade=0;                                                                   // Initialize time to fade value
+                        maxTimeToFade = 1;                                                              // Initialize Max time to fade
+                        fadeCounter=0;                                                                  // Initialize fade counter
+                        // Max 6 Digits
+                        for (i=0;i <= 6 ; i++) {                                                        // For loop that extract decimals from user input
+                            if (wholeString[i+1] >= '0' && wholeString[i+1] <= '9') {
+                                fadeCounter++;                                                          // Increment counter to be used in the next for loop
+                                timeBuffer[i] = chrToHx(wholeString[i+1]);                              // Store to buffer the converted decimal number
+                                maxTimeToFade = maxTimeToFade*10;                                       // Increment the max time to fade decimal places
+                            }
+                        }
+                        for (i = 0 ; i <= fadeCounter ; i++ ) {                                         // For loop that calculate the time fade value and store it
+                            maxTimeToFade = maxTimeToFade/10;                                           // Multiply the timer digits
+                            timetoFade = timetoFade + (timeBuffer[i]*maxTimeToFade);
+                        }
+
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
+                        GPIO_setAsInputPin(LED_PORT, LED_R);                                            // TODO disabled Red LED for debuging
+                        initFadeTime(timetoFade);
                         strcpy(outString,"\r\nSet fading period\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
@@ -682,6 +706,7 @@ char chrToHx(uint8_t number) {
 return formated;
    // return formated+0x00;
 }
+
 
 
 //void write_infoB( uint16_t *value, uint16_t *flashLocation )

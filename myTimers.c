@@ -138,7 +138,8 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 
 // calculate  the time for the fade function
 void initFadeTime(uint32_t totalTime) {
-    fadeTime = totalTime/fadeColorStep;
+
+    fadeTime = totalTime/fadeColorStep;                                         // Calculate fade step
 
 
     initfade(0,0,0,0,0,0,0);

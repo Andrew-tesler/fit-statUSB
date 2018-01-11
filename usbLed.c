@@ -18,20 +18,23 @@
  * turn off all of the LED's
  */
 void allOff() {
+
+
+#ifdef ARDUMSP
     GPIO_setAsOutputPin(LED_PORT,LED_R);
     GPIO_setAsOutputPin(LED_PORT,LED_G);
     GPIO_setAsOutputPin(LED_PORT,LED_B);
-
-#ifdef ARDUMSP
     GPIO_setOutputLowOnPin(LED_PORT,LED_R);
     GPIO_setOutputLowOnPin(LED_PORT,LED_G);
     GPIO_setOutputLowOnPin(LED_PORT,LED_B);
 #else
-    GPIO_setOutputHighOnPin(LED_PORT,LED_R);
-    GPIO_setOutputHighOnPin(LED_PORT,LED_G);
-    GPIO_setOutputHighOnPin(LED_PORT,LED_B);
+GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, GPIO_ALL); /// Input power off the RED led
+
+
+
 
 #endif //ARDUMSP
+
 
 }
 
