@@ -91,7 +91,7 @@ char nl[2] = "\n";
 char wholeString[MAX_STR_LENGTH] = "";                                                                  // Entire input str from last 'return'
 char pieceOfString[MAX_STR_LENGTH] = "";                                                                // Holds the new addition to the string
 char outString[MAX_STR_LENGTH] = "";                                                                    // Holds the outgoing string
-char deviceSN[128];
+char deviceSN[12];
 uint16_t count;
 uint16_t c = 0;
 unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
@@ -151,11 +151,12 @@ void main (void)
     // Initialize timers
 
     // Collect all the Device information in to one string
-    strcat(deviceSN,"REV:");
-    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
-    strcat(deviceSN,".");
-    strncat(deviceSN,(char *)MINOR1_ptrB,2);
-    strcat(deviceSN,"\r\nSerial: ");
+//    strcat(deviceSN,"REV:");
+//    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
+//    strcat(deviceSN,".");
+//    strncat(deviceSN,(char *)MINOR1_ptrB,2);
+//    strcat(deviceSN,"\r\nSerial: ");
+
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
 
@@ -286,11 +287,9 @@ void main (void)
 
                     case '?' :
                         // Return fit-statUSB ID
-                        // Return the Serial number of the device
-                        // For now return ATP-programmed number.
-                        // TODO Change the serial to return only Serial number without all of the REV string....
-                        USBCDC_sendDataInBackground((uint8_t*)deviceSN,
-                                                                                strlen(deviceSN),CDC0_INTFNUM,0);
+                        // Return the Serial number of the device As reported by USB API
+                        USBCDC_sendDataInBackground((uint8_t*)abramSerialStringDescriptor,
+                                                    34,CDC0_INTFNUM,0);
                         break;
 
 
