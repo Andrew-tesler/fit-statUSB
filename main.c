@@ -81,6 +81,7 @@ volatile uint16_t led;                                                          
 #define MAX_STR_LENGTH 128
 
 #define INFOB_START   (0x1900)
+#define INFOD_START   (0x1800)
 
 // ****************************************************************************************************
 
@@ -105,6 +106,9 @@ uint8_t fadeCounter = 0;                                                        
 
 int i=1;
 int n = 0;
+
+uint8_t color[8] = {0x30,0x30,0x30,0x30,0x30,0x30};                                                     // Device color to be stored to internal Flash
+                                                                                                        // Initialized to 0 in Ascii
 // ****************************************************************************************************
 
 
@@ -124,6 +128,8 @@ char *MAJOR1_ptrB = (char *)INFOB_START;                                        
 char *MINOR1_ptrB = (char *)INFOB_START+2;                                                              // Minor Revision start
 char *SERIAL_ptrB = (char *)INFOB_START+4;                                                              // Serial Number Start
 
+char *device_color = (char *)INFOD_START;                                                               // Device color flasf location
+
 // ****************************************************************************************************
 
 
@@ -136,13 +142,13 @@ char *SERIAL_ptrB = (char *)INFOB_START+4;                                      
 
 
 /*****************************************************************************************************
-*                                              MAIN FUNCTION
-******************************************************************************************************/
+ *                                              MAIN FUNCTION
+ ******************************************************************************************************/
 void main (void)
 {
     WDT_A_hold(WDT_A_BASE);                                                                             // Stop watchdog timer
     PMM_setVCore(PMM_CORE_LEVEL_3);                                                                     // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
-// REFTCOFF 0   REF Temp.Sensor off
+    // REFTCOFF 0   REF Temp.Sensor off
 
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)
@@ -151,12 +157,17 @@ void main (void)
     // Initialize timers
 
     // Collect all the Device information in to one string
-//    strcat(deviceSN,"REV:");
-//    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
-//    strcat(deviceSN,".");
-//    strncat(deviceSN,(char *)MINOR1_ptrB,2);
-//    strcat(deviceSN,"\r\nSerial: ");
+    //    strcat(deviceSN,"REV:");
+    //    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
+    //    strcat(deviceSN,".");
+    //    strncat(deviceSN,(char *)MINOR1_ptrB,2);
+    //    strcat(deviceSN,"\r\nSerial: ");
 
+    // TODO Write to flash function later for storing all of configuration on internal flash
+
+    //    FlashCtl_eraseSegment((uint8_t *)INFOD_START);                                  // Eraze Segment
+    //
+    //    FlashCtl_write8(color,(uint8_t *)INFOD_START, 16);                              //  // Store color to internal flash segment D
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
 
@@ -168,7 +179,7 @@ void main (void)
 
     // Gather information from the card
     //strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
-  //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
+    //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
     allOff();
 
@@ -225,7 +236,7 @@ void main (void)
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
                         allOff();
-//                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
+                        //                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
                         strcpy(outString,"\r\nLED is ON--Suspended function\r\n\r\n");                                      // Prepare String for Console print
 
                         USBCDC_sendDataInBackground((uint8_t*)outString,
@@ -235,6 +246,10 @@ void main (void)
                     case '#' :                                                                          // Set Led color #RRGGBB
                         Timer_A_stop(TIMER_A0_BASE);
                         Timer_B_stop(TIMER_B0_BASE);
+                        for (i = 0 ; i < 6 ; i++) {
+                            color[i] = wholeString[i+1];                                                // Store color to temp array
+                        }
+
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
                         // Convert to Hex received Red values
                         sprintf(buffer,"%d", wholeString[1]);
@@ -282,7 +297,7 @@ void main (void)
                         // Set color sequence transition from one color to another issue #8
                         strcpy(outString,"\r\n… Set color sequence\r\n\r\n");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
-                                                                            strlen(outString),CDC0_INTFNUM,0);
+                                                    strlen(outString),CDC0_INTFNUM,0);
                         break;
 
                     case '?' :
@@ -290,6 +305,9 @@ void main (void)
                         // Return the Serial number of the device As reported by USB API
                         USBCDC_sendDataInBackground((uint8_t*)abramSerialStringDescriptor,
                                                     34,CDC0_INTFNUM,0);
+                        strcpy(outString,"\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
                         break;
 
 
@@ -328,9 +346,15 @@ void main (void)
                         // TODO should be some value that is stored in the internal device Flash
                         // Returns print #RRGGBB
 
-                        strcpy(outString,"\r\nDevice color #RRGGBB\r\n\r\n");
+                        strcpy(outString,"\r\n#");
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
+                        USBCDC_sendDataInBackground((uint8_t*)color,
+                                                    6,CDC0_INTFNUM,0);
+                        strcpy(outString,"\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+
                         break;
 
                     case '-' :
@@ -701,9 +725,9 @@ char chrToHx(uint8_t number) {
         break;
 
     }
-//    formated = number - 55;
-return formated;
-   // return formated+0x00;
+    //    formated = number - 55;
+    return formated;
+    // return formated+0x00;
 }
 
 
