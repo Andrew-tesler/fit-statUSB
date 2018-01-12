@@ -156,6 +156,7 @@ void main (void)
 //    strcat(deviceSN,".");
 //    strncat(deviceSN,(char *)MINOR1_ptrB,2);
 //    strcat(deviceSN,"\r\nSerial: ");
+
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
 
@@ -286,9 +287,9 @@ void main (void)
 
                     case '?' :
                         // Return fit-statUSB ID
-                        // Return the Serial number of the device programed during ATP
-                        USBCDC_sendDataInBackground((uint8_t*)deviceSN,
-                                                    strlen(deviceSN),CDC0_INTFNUM,0);
+                        // Return the Serial number of the device As reported by USB API
+                        USBCDC_sendDataInBackground((uint8_t*)abramSerialStringDescriptor,
+                                                    34,CDC0_INTFNUM,0);
                         break;
 
 
