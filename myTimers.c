@@ -104,6 +104,9 @@ void initTimers(int Red,int Green,int Blue) {
     Timer_A_startCounter(TIMER_A0_BASE,TIMER_A_UP_MODE);
 
 
+    if (Red == 0) {
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R); /// Input power off the RED led
+    }
 
 
 

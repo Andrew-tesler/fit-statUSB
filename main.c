@@ -246,6 +246,9 @@ void main (void)
                         // Set color command in the format #RRGGBB
                         // Return Value OK
                     case '#' :
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
                         // Store the data to array
                         for (i=0;i<6;i++) {
                             if (wholeString[i+1] == 0x00) {
@@ -808,40 +811,40 @@ void converIncomingColor() {
     formatedColor[2] = 0;
     // Test if array place is not empty
     if (incomingColor[0] != 0x00) {
-    // Convert to Hex received Red values
-    sprintf(buffer,"%d", incomingColor[0]);
-    tempTens = chrToHx(atol(buffer));
-    sprintf(buffer,"%d", incomingColor[1]);
-    tempOnes = chrToHx(atol(buffer));
+        // Convert to Hex received Red values
+        sprintf(buffer,"%d", incomingColor[0]);
+        tempTens = chrToHx(atol(buffer));
+        sprintf(buffer,"%d", incomingColor[1]);
+        tempOnes = chrToHx(atol(buffer));
 
 
-    tempTens = (tempTens << 4);
-    formatedColor[0] = tempTens|tempOnes;
+        tempTens = (tempTens << 4);
+        formatedColor[0] = tempTens|tempOnes;
     }
 
     if (incomingColor[2] != 0x00) {
-    // Convert to Hex received Red values
-    sprintf(buffer,"%d", incomingColor[2]);
-    tempTens = chrToHx(atol(buffer));
-    sprintf(buffer,"%d", incomingColor[3]);
-    tempOnes = chrToHx(atol(buffer));
+        // Convert to Hex received Red values
+        sprintf(buffer,"%d", incomingColor[2]);
+        tempTens = chrToHx(atol(buffer));
+        sprintf(buffer,"%d", incomingColor[3]);
+        tempOnes = chrToHx(atol(buffer));
 
 
-    tempTens = (tempTens << 4);
-    formatedColor[1] = tempTens|tempOnes;
+        tempTens = (tempTens << 4);
+        formatedColor[1] = tempTens|tempOnes;
 
     }
 
     if (incomingColor[4] != 0x00) {
-    // Convert to Hex received Red values
-    sprintf(buffer,"%d", incomingColor[4]);
-    tempTens = chrToHx(atol(buffer));
-    sprintf(buffer,"%d", incomingColor[5]);
-    tempOnes = chrToHx(atol(buffer));
+        // Convert to Hex received Red values
+        sprintf(buffer,"%d", incomingColor[4]);
+        tempTens = chrToHx(atol(buffer));
+        sprintf(buffer,"%d", incomingColor[5]);
+        tempOnes = chrToHx(atol(buffer));
 
 
-    tempTens = (tempTens << 4);
-    formatedColor[2] = tempTens|tempOnes;
+        tempTens = (tempTens << 4);
+        formatedColor[2] = tempTens|tempOnes;
     }
     // Send to the fade function
 
