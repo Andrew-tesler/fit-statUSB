@@ -218,8 +218,11 @@ void main (void)
                 //						strlen(pieceOfString),CDC0_INTFNUM,0);
 
                 // Has the user pressed return yet?
-                if (retInString(wholeString)){
 
+
+
+                if (retInString(wholeString)){
+/*
                     switch(wholeString[0]) {
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
                         Timer_A_stop(TIMER_A0_BASE);
@@ -381,7 +384,10 @@ void main (void)
                     for (i = 0; i < MAX_STR_LENGTH; i++){
                         wholeString[i] = 0x00;
                     }
+                    */
                 }
+
+
                 bCDCDataReceived_event = FALSE;
 
             } // Data recived event
