@@ -92,8 +92,11 @@ char pieceOfString[MAX_STR_LENGTH] = "";                                        
 char outString[MAX_STR_LENGTH] = "";                                                                    // Holds the outgoing string
 char deviceSN[12];
 
+// *************************************** New Flow declarations and Misc *****************************
 uint8_t i;                                                                                              // General counter value
 
+uint8_t incomingColor[6];                                                                               // Array for incoming color data
+uint8_t formatedColor[3];                                                                               // Formated array color data
 //uint16_t count;
 //uint16_t c = 0;
 //unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
@@ -112,7 +115,7 @@ uint8_t i;                                                                      
 uint8_t retInString (char* string);
 void printHelp(void);
 char chrToHx(uint8_t);
-
+void converIncomingColor(void);                                                                         // Convert incoming color to formated color
 // ****************************************************************************************************
 
 
@@ -240,7 +243,24 @@ void main (void)
                         USB_connect();                              // Connect the USB back on
                         break;
 
+                        // Set color command in the format #RRGGBB
+                        // Return Value OK
                     case '#' :
+                        // Store the data to array
+                        for (i=0;i<6;i++) {
+                            if (wholeString[i+1] == 0x00) {
+                                break;
+                            }
+                            incomingColor[i] = wholeString[i+1];                                        // The first string is the switch case command
+
+                        }
+                        converIncomingColor();
+                        initTimers(formatedColor[0],formatedColor[1],formatedColor[2]);
+
+                        // Test
+                        strcpy(outString,"\r\nSet Color To, OK \r\n");                                                         // Send new Line when return pressed
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
 
                         break;
 
@@ -259,12 +279,16 @@ void main (void)
                         wholeString[i] = 0x00;
                         outString[i]   = 0x00;
                         pieceOfString[i] = 0x00;
+                        if (i < 6 ) {
+                            incomingColor[i] = 0x00;                                                // reset the incoming color also
+                        }
                     }
 
 
 
 
-                /*
+
+                    /*
                     switch(wholeString[0]) {
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
                         Timer_A_stop(TIMER_A0_BASE);
@@ -426,19 +450,19 @@ void main (void)
                     for (i = 0; i < MAX_STR_LENGTH; i++){
                         wholeString[i] = 0x00;
                     }
-                 */
-            }
+                     */
+                }
 
 
-            bCDCDataReceived_event = FALSE;
+                bCDCDataReceived_event = FALSE;
 
-        } // Data recived event
-        break;
+            } // Data recived event
+            break;
 
-        // These cases are executed while your device is disconnected from
-        // the host (meaning, not enumerated); enumerated but suspended
-        // by the host, or connected to a powered hub without a USB host
-        // present.
+            // These cases are executed while your device is disconnected from
+            // the host (meaning, not enumerated); enumerated but suspended
+            // by the host, or connected to a powered hub without a USB host
+            // present.
         case ST_PHYS_DISCONNECTED:
         case ST_ENUM_SUSPENDED:
         case ST_PHYS_CONNECTED_NOENUM_SUSP:
@@ -453,12 +477,12 @@ void main (void)
             // be LPM0 or active-CPU.
         case ST_ENUM_IN_PROGRESS:
         default:;
-    }
+        }
 
-    if (ReceiveError || SendError){
-        // TODO: place code here to handle error
-    }
-}  //while(1)
+        if (ReceiveError || SendError){
+            // TODO: place code here to handle error
+        }
+    }  //while(1)
 }                               // main()
 
 /*  
@@ -773,3 +797,53 @@ char chrToHx(uint8_t number) {
 //    );
 //}
 
+// Convert incoming color Asci to Decimal numbers and store in global
+void converIncomingColor() {
+
+    uint8_t tempTens,tempOnes;
+    char buffer[2];
+
+    formatedColor[0] = 0;                                                                               // Clear the array
+    formatedColor[1] = 0;
+    formatedColor[2] = 0;
+    // Test if array place is not empty
+    if (incomingColor[0] != 0x00) {
+    // Convert to Hex received Red values
+    sprintf(buffer,"%d", incomingColor[0]);
+    tempTens = chrToHx(atol(buffer));
+    sprintf(buffer,"%d", incomingColor[1]);
+    tempOnes = chrToHx(atol(buffer));
+
+
+    tempTens = (tempTens << 4);
+    formatedColor[0] = tempTens|tempOnes;
+    }
+
+    if (incomingColor[2] != 0x00) {
+    // Convert to Hex received Red values
+    sprintf(buffer,"%d", incomingColor[2]);
+    tempTens = chrToHx(atol(buffer));
+    sprintf(buffer,"%d", incomingColor[3]);
+    tempOnes = chrToHx(atol(buffer));
+
+
+    tempTens = (tempTens << 4);
+    formatedColor[1] = tempTens|tempOnes;
+
+    }
+
+    if (incomingColor[4] != 0x00) {
+    // Convert to Hex received Red values
+    sprintf(buffer,"%d", incomingColor[4]);
+    tempTens = chrToHx(atol(buffer));
+    sprintf(buffer,"%d", incomingColor[5]);
+    tempOnes = chrToHx(atol(buffer));
+
+
+    tempTens = (tempTens << 4);
+    formatedColor[2] = tempTens|tempOnes;
+    }
+    // Send to the fade function
+
+
+}
