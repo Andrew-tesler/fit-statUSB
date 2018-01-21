@@ -247,14 +247,14 @@ void main (void)
                     default :
 
 
-                        strcpy(outString,"\n");                                                         // Send new Line when return pressed
+                        strcpy(outString,"\r\n");                                                         // Send new Line when return pressed
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
                         break;
                     }
 
 
-                    // Clear the string in preparation for the next one
+                    // Clear the string in preparation for the next one Resolve Ghost String bug
                     for (i = 0; i < MAX_STR_LENGTH; i++){
                         wholeString[i] = 0x00;
                         outString[i]   = 0x00;
