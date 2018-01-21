@@ -63,9 +63,9 @@ targetFlashDetection()
 
 
 // Test Varibles
-char val;
+//char val;
 
-char ones,tens;
+//char ones,tens;
 // ****************************************************************************************************
 
 
@@ -79,7 +79,6 @@ volatile uint16_t led;                                                          
 // ******************************************** FILE DEFINES ******************************************
 #define BUFFER_SIZE 256
 #define MAX_STR_LENGTH 128
-
 #define INFOB_START   (0x1900)
 
 // ****************************************************************************************************
@@ -92,19 +91,20 @@ char wholeString[MAX_STR_LENGTH] = "";                                          
 char pieceOfString[MAX_STR_LENGTH] = "";                                                                // Holds the new addition to the string
 char outString[MAX_STR_LENGTH] = "";                                                                    // Holds the outgoing string
 char deviceSN[12];
-uint16_t count;
-uint16_t c = 0;
-unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
-char buffer[2] = {0x00,0x00};
 
+uint8_t i;                                                                                              // General counter value
+
+//uint16_t count;
+//uint16_t c = 0;
+//unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
+//char buffer[2] = {0x00,0x00};
 // values time fade function
-uint32_t timetoFade =300;                                                                               // Default value for time to fade
-uint8_t timeBuffer[6] = {0,0,0,0,0,0};                                                                  // Buffer to store The decimal numbers from user input
-uint32_t maxTimeToFade = 100000;                                                                        // Maximum Number to fade TODO try to remove this
-uint8_t fadeCounter = 0;                                                                                // Counter for array size
-
-int i=1;
-int n = 0;
+//uint32_t timetoFade =300;                                                                               // Default value for time to fade
+//uint8_t timeBuffer[6] = {0,0,0,0,0,0};                                                                  // Buffer to store The decimal numbers from user input
+//uint32_t maxTimeToFade = 100000;                                                                        // Maximum Number to fade TODO try to remove this
+//uint8_t fadeCounter = 0;                                                                                // Counter for array size
+//int i=1;
+//int n = 0;
 // ****************************************************************************************************
 
 
@@ -136,26 +136,28 @@ char *SERIAL_ptrB = (char *)INFOB_START+4;                                      
 
 
 /*****************************************************************************************************
-*                                              MAIN FUNCTION
-******************************************************************************************************/
+ *                                              MAIN FUNCTION
+ ******************************************************************************************************/
 void main (void)
+
 {
     WDT_A_hold(WDT_A_BASE);                                                                             // Stop watchdog timer
     PMM_setVCore(PMM_CORE_LEVEL_3);                                                                     // Minimum Vcore setting required for the USB API is PMM_CORE_LEVEL_2 .
-// REFTCOFF 0   REF Temp.Sensor off
+    // REFTCOFF 0   REF Temp.Sensor off
 
 
     USBHAL_initPorts();           // Config GPIOS for low-power (output low)
     USBHAL_initClocks(12000000);   // Config clocks. MCLK=SMCLK=FLL=8MHz; ACLK=REFO=32kHz
     USB_setup(TRUE, TRUE); // Init USB & events; if a host is present, connect
+    /*
     // Initialize timers
-
     // Collect all the Device information in to one string
-//    strcat(deviceSN,"REV:");
-//    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
-//    strcat(deviceSN,".");
-//    strncat(deviceSN,(char *)MINOR1_ptrB,2);
-//    strcat(deviceSN,"\r\nSerial: ");
+    //    strcat(deviceSN,"REV:");
+    //    strncat(deviceSN,(char *)MAJOR1_ptrB,2);
+    //    strcat(deviceSN,".");
+    //    strncat(deviceSN,(char *)MINOR1_ptrB,2);
+    //    strcat(deviceSN,"\r\nSerial: ");
+     */
 
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
@@ -168,7 +170,7 @@ void main (void)
 
     // Gather information from the card
     //strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
-  //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
+    //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
     allOff();
 
@@ -176,7 +178,7 @@ void main (void)
     {
         uint8_t ReceiveError = 0, SendError = 0;
         //uint16_t count;
-        uint8_t i;
+        //        uint8_t i;
 
         // Check the USB state and directly main loop accordingly
         switch (USB_getConnectionState())
@@ -218,11 +220,51 @@ void main (void)
                 //						strlen(pieceOfString),CDC0_INTFNUM,0);
 
                 // Has the user pressed return yet?
-
-
-
                 if (retInString(wholeString)){
-/*
+
+                    // each switch case here is represents the first later in the user command
+                    // And parses the string accordingly
+                    switch(wholeString[0]) {
+                    // Enter device USB BSL mode for program updates.
+                    case 'P' :
+                        strcpy(outString,"\r\nEntering device Programming mode - Remove the device after programming\r\n\r\n");
+                        // Send String here the USB will kill itself next
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        Timer_A_stop(TIMER_A0_BASE);
+                        // Programming mode
+                        USB_disconnect();                           // Disconnect USB device
+                        __disable_interrupt();                      // Disable global interrupt
+                        ((void (*)())0x1000)();                     // Set the bsl address
+                        USB_connect();                              // Connect the USB back on
+                        break;
+
+                    case '#' :
+
+                        break;
+
+                    default :
+
+
+                        strcpy(outString,"\n");                                                         // Send new Line when return pressed
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+                    }
+
+
+                    // Clear the string in preparation for the next one
+                    for (i = 0; i < MAX_STR_LENGTH; i++){
+                        wholeString[i] = 0x00;
+                        outString[i]   = 0x00;
+                        pieceOfString[i] = 0x00;
+                    }
+
+
+
+
+                /*
                     switch(wholeString[0]) {
                     case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
                         Timer_A_stop(TIMER_A0_BASE);
@@ -384,19 +426,19 @@ void main (void)
                     for (i = 0; i < MAX_STR_LENGTH; i++){
                         wholeString[i] = 0x00;
                     }
-                    */
-                }
+                 */
+            }
 
 
-                bCDCDataReceived_event = FALSE;
+            bCDCDataReceived_event = FALSE;
 
-            } // Data recived event
-            break;
+        } // Data recived event
+        break;
 
-            // These cases are executed while your device is disconnected from
-            // the host (meaning, not enumerated); enumerated but suspended
-            // by the host, or connected to a powered hub without a USB host
-            // present.
+        // These cases are executed while your device is disconnected from
+        // the host (meaning, not enumerated); enumerated but suspended
+        // by the host, or connected to a powered hub without a USB host
+        // present.
         case ST_PHYS_DISCONNECTED:
         case ST_ENUM_SUSPENDED:
         case ST_PHYS_CONNECTED_NOENUM_SUSP:
@@ -411,12 +453,12 @@ void main (void)
             // be LPM0 or active-CPU.
         case ST_ENUM_IN_PROGRESS:
         default:;
-        }
+    }
 
-        if (ReceiveError || SendError){
-            // TODO: place code here to handle error
-        }
-    }  //while(1)
+    if (ReceiveError || SendError){
+        // TODO: place code here to handle error
+    }
+}  //while(1)
 }                               // main()
 
 /*  
@@ -707,9 +749,9 @@ char chrToHx(uint8_t number) {
         break;
 
     }
-//    formated = number - 55;
-return formated;
-   // return formated+0x00;
+    //    formated = number - 55;
+    return formated;
+    // return formated+0x00;
 }
 
 
