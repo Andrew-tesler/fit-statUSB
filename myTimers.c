@@ -8,23 +8,34 @@
 #include "myTimers.h"
 #include "defines.c"
 
-char timer = 0x00;
-int direction = 0;                                                                      // Direction of the fade
+//char timer = 0x00;
+//int direction = 0;                                                                      // Direction of the fade
+
+unsigned int timerBcounter[3];                                                          // Counter for each of the colors
 
 uint8_t justCounter;
 uint8_t smallerCounter;
+uint8_t colorsNumber;                                                                   // Number of colors transition
 
+int colorCounter[MAX_SEQ_COLORS][3];                                                    // Counter for fade logic
+int colorLocation[MAX_SEQ_COLORS];                                                      // Which color currently fading for fade logic
+uint8_t colortick[3];                                                                   // Counter Tick for fade logic
+uint8_t fadeDirection[3];                                                               // Direction of LED to fade
 
-uint16_t fadeTick = 0;              // Fade tick - Temp Value for the timer function, Each clock increment increments this value
-uint16_t fadeTickGlobal=5000;       // fadeTickGlobal - Global time from color transition from one color to another in ms
-uint16_t fadeTime = 0;              // Fade time - calculated value from the global time needed and the steps to transition
-uint8_t fadeColorStep = 255;          // Steps for transition to the next desired color
-                                                                                        // Fade time between each fade intervals TODO Will need to use with color differential number
-                                                                                        //Total time of fade from one color to another
+//uint8_t timerTick = 0;
+//uint16_t fadeTick = 0;              // Fade tick - Temp Value for the timer function, Each clock increment increments this value
+//uint16_t fadeTickGlobal=5000;       // fadeTickGlobal - Global time from color transition from one color to another in ms
+//uint16_t fadeTime = 0;              // Fade time - calculated value from the global time needed and the steps to transition
+//uint8_t fadeColorStep = 255;          // Steps for transition to the next desired color
+// Fade time between each fade intervals TODO Will need to use with color differential number
+//Total time of fade from one color to another
 
 void initTimers(int Red,int Green,int Blue) {
 
-
+    currentRGBColor[0] = Red;
+    currentRGBColor[1] = Green;
+    currentRGBColor[2] = Blue;
+    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
     //
     //	Timer_A_initUpDownModeParam initUpDownParam = {0};
     //	initUpDownParam.clockSource								= TIMER_A_CLOCKSOURCE_SMCLK;
@@ -71,7 +82,7 @@ void initTimers(int Red,int Green,int Blue) {
     initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
     initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
     initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-//    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    //    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc1.compareValue			= Red;
     //
     // Blue
@@ -79,7 +90,7 @@ void initTimers(int Red,int Green,int Blue) {
     initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
     initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
     initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    //    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc2.compareValue			= Blue;
 
     // Red
@@ -87,7 +98,7 @@ void initTimers(int Red,int Green,int Blue) {
     initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
     initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
     initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    //    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc3.compareValue			= Green;
     //
     Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -97,7 +108,7 @@ void initTimers(int Red,int Green,int Blue) {
 
     Timer_A_clearTimerInterrupt( TIMER_A0_BASE );                                    // Clear TAxIFG
 
-//    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
+    //    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
     //Initiaze compare mode
     Timer_A_clearCaptureCompareInterrupt(TIMER_A0_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_1 + TIMER_A_CAPTURECOMPARE_REGISTER_2 + TIMER_A_CAPTURECOMPARE_REGISTER_3);
 
@@ -125,7 +136,7 @@ void initTimers(int Red,int Green,int Blue) {
 void initfadeClock() {
 
     Timer_B_initUpModeParam initTimer_b = {0};
-//    0xDCD;
+    //    0xDCD;
     initTimer_b.clockSource                             = TIMER_B_CLOCKSOURCE_SMCLK;
     initTimer_b.clockSourceDivider                      = TIMER_B_CLOCKSOURCE_DIVIDER_7;
     initTimer_b.timerPeriod                             = 0xDCD;
@@ -144,10 +155,10 @@ void initfadeClock() {
 // calculate  the time for the fade function
 void updateFadeTime(uint32_t totalTime) {
 
-    fadeTime = totalTime/fadeColorStep;                                         // Calculate fade step
+    //    fadeTime = totalTime/fadeColorStep;                                         // Calculate fade step
 
 
-   // initfade(0,0,0,0,0,0,0);
+    // initfade(0,0,0,0,0,0,0);
 
 
 }
@@ -161,7 +172,13 @@ void initFade(uint8_t colorNum) {
             fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
         }
     }
-    initfadeClock();                                                                                                                        // Start Timer B0
+
+    colorsNumber = colorNum;
+    colortick[0] = 0;                                                                                                                          // Clear time tick number
+    colortick[1] = 0;
+    colortick[2] = 0;
+    initTimers(colorSeq[0][0], colorSeq[0][1], colorSeq[0][2]);                                                                             // Start the LED with the first color
+//    initfadeClock();                                                                                                                        // Start Timer B0
 }
 //*****************************************************************************
 // Interrupt Service Routine
@@ -169,25 +186,86 @@ void initFade(uint8_t colorNum) {
 //
 #pragma vector=TIMER0_B0_VECTOR
 __interrupt void timer_ISRB0 (void) {
+    // the timer should run and update the PWM clock(TIMERA0) if any change needed
+    // Because of several fade values present the script will also need to iterate on the array of colors
+    colortick[0]++;
+    colortick[1]++;
+    colortick[2]++;
 
 
+
+    for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+        if (colorFadeDiff > 0) {
+            fadeDirection[smallerCounter] = 1;  // Count up
+        }
+        else {
+            fadeDirection[smallerCounter] = 0; // Count down
+        }
+
+        switch (fadeDirection[smallerCounter]) {
+
+        case 1: {
+            if (colortick[smallerCounter] >= fadeTimeMs[0][smallerCounter]) {
+                currentRGBColor[smallerCounter]++;
+                colortick[smallerCounter] = 0;
+            }
+
+
+        }
+        case 0: {
+            if (colortick[smallerCounter] >= fadeTimeMs[0][smallerCounter]) {
+                currentRGBColor[smallerCounter] = currentRGBColor[smallerCounter]-1;
+                colortick[smallerCounter] = 0;
+            }
+
+        }
+
+        }
+
+
+    }
     Timer_A_stop(TIMER_A0_BASE);
+    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
+    //    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
+    //
+    //    if (timerTick >= 100) {
+    //        currentRGBColor[0] = currentRGBColor[0] + 1 ;
+    //        timerTick=0;
+    //        Timer_A_stop(TIMER_A0_BASE);
+    //        initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
+    //    }
+    // if ()
+    //    colorCounter[MAX_SEQ_COLORS][3];
+    //    currentRGBColor
+    //    fadeTimeMs
+    //    colorSeq
+
+
+    // Stop Timer A and update only when needed
+
+
+
+
+    /*
+
+
     //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
     initTimers(0x01,0x01,timer);
 
 
 
-//
-//
-////
-//    fadeTickGlobal = fadeTime/2;                                                  // TODO the 255 number will have to be the color diference of each led
+
+    //
+    //
+    ////
+    //    fadeTickGlobal = fadeTime/2;                                                  // TODO the 255 number will have to be the color diference of each led
 
     if (fadeTick <= fadeTimer) {                                                           // If the fade tick smaller that the calculted global
         //
         fadeTick++;
 
     }
-////    // FasdeTick havent reached incriment the counter
+    ////    // FasdeTick havent reached incriment the counter
     else {
         fadeTick=0;
 
@@ -212,17 +290,19 @@ __interrupt void timer_ISRB0 (void) {
 
             break;
         }
-//
+        //
     }
-////
-//                                                                 // Update the timer
+    ////
+    //                                                                 // Update the timer
 
 
-//
-////    GPIO_setAsOutputPin(LED_PORT, LED_B);
-////        GPIO_toggleOutputOnPin( LED_PORT, LED_B );
-//
-//
+    //
+    ////    GPIO_setAsOutputPin(LED_PORT, LED_B);
+    ////        GPIO_toggleOutputOnPin( LED_PORT, LED_B );
+    //
+    //
+     *
+     */
     Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_0);
 
 }

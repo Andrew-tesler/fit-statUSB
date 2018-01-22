@@ -10,9 +10,13 @@
 
 uint32_t fadeTimer;
 // TODO add colorSeq and colorFadeDiff initialization to 0
-signed int colorFadeDiff[MAX_SEQ_COLORS][3];                                                // Array to store color Difference data
-uint8_t colorSeq[MAX_SEQ_COLORS][3];                                                        // 2D array to store the color sequence numbers
-double fadeTimeMs[MAX_SEQ_COLORS][3];                                                               // QTY in MS needed to pass for the color to change
+signed  colorFadeDiff[MAX_SEQ_COLORS][3];                                                // Array to store color Difference data
+int colorSeq[MAX_SEQ_COLORS][3];                                                        // 2D array to store the color sequence numbers
+//double fadeTimeMs[MAX_SEQ_COLORS][3];                                                     // QTY in MS needed to pass for the color to change TODO check with this or long for better resolution
+signed int fadeTimeMs[MAX_SEQ_COLORS][3];                                                 // QTY in MS needed to pass for the color to change
+
+int currentRGBColor[3];                                                                     // Current Color
+
 
 
 // Prototypes
