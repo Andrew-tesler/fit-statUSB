@@ -608,65 +608,65 @@ void __attribute__ ((interrupt(UNMI_VECTOR))) UNMI_ISR (void)
         USB_disable(); // Disable
     }
 }
-
-/*
- * Get the data buffer array and according to data set the leds
- * @PARAM null
- */
-void setLeds() {
-    // Counter initialization
-    uint8_t i = 0;
-    char commandType = 0;
-    // Go all over the buffer and search the command A to star parsing for commands
-    // Remove 4 bytes from Buffer size to eliminate the chance to address overflow
-    for (i = 0; i < BUFFER_SIZE - 4 ; i++ ) {
-        // If command A found, go to the next bytes and issue commands to led
-        if (dataBuffer[i] == 'A') {
-            // go to the command parsing
-            commandType = dataBuffer[i+1];
-
-            switch(commandType) {
-            // Toggle command
-            case 't'  :
-                // Evaluate the led number and toggle it On / off
-                switch(dataBuffer[i+2]) {
-                // Case of LED R
-                case 'r' :
-                    GPIO_toggleOutputOnPin(LED_PORT,LED_R);
-                    break;
-                    // Case of LED G
-                case 'g' :
-                    GPIO_toggleOutputOnPin(LED_PORT,LED_G);
-                    break;
-                    // Case of LED B
-                case 'b' :
-                    GPIO_toggleOutputOnPin(LED_PORT,LED_B);
-                    break;
-                }
-                break; // Break toggle command
-                // Turn on
-                case  'a' :
-                    led = dataBuffer[i+3];
-                    Timer_A_stop(TIMER_A0_BASE);
-                    Timer_A_setCompareValue(TIMER_A0_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_2,0xEEEE);
-                    Timer_A_startCounter(TIMER_A0_BASE,TIMER_A_CONTINUOUS_MODE);
-                    //statement(s);
-                    break; /* optional */
-                case 'l' :
-                    // Statement
-                    break;
-
-
-
-            } // Close parsing of command start switch case
-
-
-        } // Close if loop test for 'A'
-    } // Close for loop
-
-    GPIO_toggleOutputOnPin(GPIO_PORT_P1,dataBuffer[0]);
-
-}
+//
+///*
+// * Get the data buffer array and according to data set the leds
+// * @PARAM null
+// */
+//void setLeds() {
+//    // Counter initialization
+//    uint8_t i = 0;
+//    char commandType = 0;
+//    // Go all over the buffer and search the command A to star parsing for commands
+//    // Remove 4 bytes from Buffer size to eliminate the chance to address overflow
+//    for (i = 0; i < BUFFER_SIZE - 4 ; i++ ) {
+//        // If command A found, go to the next bytes and issue commands to led
+//        if (dataBuffer[i] == 'A') {
+//            // go to the command parsing
+//            commandType = dataBuffer[i+1];
+//
+//            switch(commandType) {
+//            // Toggle command
+//            case 't'  :
+//                // Evaluate the led number and toggle it On / off
+//                switch(dataBuffer[i+2]) {
+//                // Case of LED R
+//                case 'r' :
+//                    GPIO_toggleOutputOnPin(LED_PORT,LED_R);
+//                    break;
+//                    // Case of LED G
+//                case 'g' :
+//                    GPIO_toggleOutputOnPin(LED_PORT,LED_G);
+//                    break;
+//                    // Case of LED B
+//                case 'b' :
+//                    GPIO_toggleOutputOnPin(LED_PORT,LED_B);
+//                    break;
+//                }
+//                break; // Break toggle command
+//                // Turn on
+//                case  'a' :
+//                    led = dataBuffer[i+3];
+//                    Timer_A_stop(TIMER_A0_BASE);
+//                    Timer_A_setCompareValue(TIMER_A0_BASE,TIMER_A_CAPTURECOMPARE_REGISTER_2,0xEEEE);
+//                    Timer_A_startCounter(TIMER_A0_BASE,TIMER_A_CONTINUOUS_MODE);
+//                    //statement(s);
+//                    break; /* optional */
+//                case 'l' :
+//                    // Statement
+//                    break;
+//
+//
+//
+//            } // Close parsing of command start switch case
+//
+//
+//        } // Close if loop test for 'A'
+//    } // Close for loop
+//
+//    GPIO_toggleOutputOnPin(GPIO_PORT_P1,dataBuffer[0]);
+//
+//}
 
 /*
  *   int i ;
@@ -761,45 +761,45 @@ void printHelp() {
     // HW revision
     // Status of LEDS
 
-    // Prepare the first line of print
-    strcpy(outString,"*******************************************************\n\n\r");
-    // Send the response over USB
-    USBCDC_sendDataInBackground((uint8_t*)outString,
-                                strlen(outString),CDC0_INTFNUM,0);
-
-    // add data to String of SN to test
-    //strcat(deviceSN,"56987\t Rev.1.0\n\n\r");
-    // Print device SN
-    USBCDC_sendDataInBackground((uint8_t*)deviceSN,
-                                strlen(deviceSN),CDC0_INTFNUM,0);
-
-    //strcpy(outString,"SN:deviceSN\t\t\t1235456\n\rDATE:\t\t\t03/01/2017\n\rProgram Revision:\t1.0\n\rHW Revision:\t\t1.0\n\rRed: 0xFFFF\tGreen: 0xFFFE\tBlue: 0xFFFF\n\n\r");
-    USBCDC_sendDataInBackground((uint8_t*)outString,
-                                strlen(outString),CDC0_INTFNUM,0);
-
-    // Available commands, Broken to many line to simplify the look of the program
-    // help command
-    strcpy(outString,"\n-H\t\t\t-will print this screen\r\n\r\n");
-    // Send the response over USB
-    USBCDC_sendDataInBackground((uint8_t*)outString,
-                                strlen(outString),CDC0_INTFNUM,0);
-    // device SN
-    strcpy(outString,"-V\t\t\t-Print the device sn and revision\r\n\r\n");
-    // Send the response over USB
-    USBCDC_sendDataInBackground((uint8_t*)outString,
-                                strlen(outString),CDC0_INTFNUM,0);
-
-    strcpy(outString,"# HTML Color Code - #FFFFFF turn all the LED's ON (White)\t\t\t\r\n\r\n");
-    // Send the response over USB
-    USBCDC_sendDataInBackground((uint8_t*)outString,
-                                strlen(outString),CDC0_INTFNUM,0);
-
-
-    // End of information Line
-    strcpy(outString,"*******************************************************\r\n\r\n");
-    // Send the response over USB
-    USBCDC_sendDataInBackground((uint8_t*)outString,
-                                strlen(outString),CDC0_INTFNUM,0);
+//    // Prepare the first line of print
+//    strcpy(outString,"*******************************************************\n\n\r");
+//    // Send the response over USB
+//    USBCDC_sendDataInBackground((uint8_t*)outString,
+//                                strlen(outString),CDC0_INTFNUM,0);
+//
+//    // add data to String of SN to test
+//    //strcat(deviceSN,"56987\t Rev.1.0\n\n\r");
+//    // Print device SN
+//    USBCDC_sendDataInBackground((uint8_t*)deviceSN,
+//                                strlen(deviceSN),CDC0_INTFNUM,0);
+//
+//    //strcpy(outString,"SN:deviceSN\t\t\t1235456\n\rDATE:\t\t\t03/01/2017\n\rProgram Revision:\t1.0\n\rHW Revision:\t\t1.0\n\rRed: 0xFFFF\tGreen: 0xFFFE\tBlue: 0xFFFF\n\n\r");
+//    USBCDC_sendDataInBackground((uint8_t*)outString,
+//                                strlen(outString),CDC0_INTFNUM,0);
+//
+//    // Available commands, Broken to many line to simplify the look of the program
+//    // help command
+//    strcpy(outString,"\n-H\t\t\t-will print this screen\r\n\r\n");
+//    // Send the response over USB
+//    USBCDC_sendDataInBackground((uint8_t*)outString,
+//                                strlen(outString),CDC0_INTFNUM,0);
+//    // device SN
+//    strcpy(outString,"-V\t\t\t-Print the device sn and revision\r\n\r\n");
+//    // Send the response over USB
+//    USBCDC_sendDataInBackground((uint8_t*)outString,
+//                                strlen(outString),CDC0_INTFNUM,0);
+//
+//    strcpy(outString,"# HTML Color Code - #FFFFFF turn all the LED's ON (White)\t\t\t\r\n\r\n");
+//    // Send the response over USB
+//    USBCDC_sendDataInBackground((uint8_t*)outString,
+//                                strlen(outString),CDC0_INTFNUM,0);
+//
+//
+//    // End of information Line
+//    strcpy(outString,"*******************************************************\r\n\r\n");
+//    // Send the response over USB
+//    USBCDC_sendDataInBackground((uint8_t*)outString,
+//                                strlen(outString),CDC0_INTFNUM,0);
 
 
 }

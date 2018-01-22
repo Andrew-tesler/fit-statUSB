@@ -10,17 +10,17 @@
 
 //char timer = 0x00;
 //int direction = 0;                                                                      // Direction of the fade
-
-unsigned int timerBcounter[3];                                                          // Counter for each of the colors
-
-uint8_t justCounter;
+//
+//unsigned int timerBcounter[3];                                                          // Counter for each of the colors
+//
+//uint8_t justCounter;
 uint8_t smallerCounter;
 uint8_t colorsNumber;                                                                   // Number of colors transition
-
-int colorCounter[MAX_SEQ_COLORS][3];                                                    // Counter for fade logic
-int colorLocation[MAX_SEQ_COLORS];                                                      // Which color currently fading for fade logic
-uint8_t colortick[3];                                                                   // Counter Tick for fade logic
-uint8_t fadeDirection[3];                                                               // Direction of LED to fade
+//
+//int colorCounter[MAX_SEQ_COLORS][3];                                                    // Counter for fade logic
+int colorLocation;                                                        // Which color currently fading for fade logic
+uint8_t colortick;                                                                   // Counter Tick for fade logic
+//uint8_t fadeDirection[3];                                                               // Direction of LED to fade
 
 //uint8_t timerTick = 0;
 //uint16_t fadeTick = 0;              // Fade tick - Temp Value for the timer function, Each clock increment increments this value
@@ -166,19 +166,20 @@ void updateFadeTime(uint32_t totalTime) {
 // Get the colors sequence and sequence number and initialize the fade command
 void initFade(uint8_t colorNum) {
     // Calculate the difference between each fade sequence
-    for (justCounter = 0 ; justCounter < colorNum-1 ; justCounter++) {
-        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
-            colorFadeDiff[justCounter][smallerCounter] = colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter];   // Calculate and store the difference
-            fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
-        }
-    }
+//    for (justCounter = 0 ; justCounter < colorNum-1 ; justCounter++) {
+//        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+//            colorFadeDiff[justCounter][smallerCounter] = colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter];   // Calculate and store the difference
+//            fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
+//        }
+//    }
 
     colorsNumber = colorNum;
-    colortick[0] = 0;                                                                                                                          // Clear time tick number
-    colortick[1] = 0;
-    colortick[2] = 0;
+    colortick = 0;                                                                                                                          // Clear time tick number
+
     initTimers(colorSeq[0][0], colorSeq[0][1], colorSeq[0][2]);                                                                             // Start the LED with the first color
-//    initfadeClock();                                                                                                                        // Start Timer B0
+    colorLocation = 0;
+
+    initfadeClock();                                                                                                                        // Start Timer B0
 }
 //*****************************************************************************
 // Interrupt Service Routine
@@ -188,19 +189,38 @@ void initFade(uint8_t colorNum) {
 __interrupt void timer_ISRB0 (void) {
     // the timer should run and update the PWM clock(TIMERA0) if any change needed
     // Because of several fade values present the script will also need to iterate on the array of colors
-    colortick[0]++;
-    colortick[1]++;
-    colortick[2]++;
+    colortick++;
+//    colortick[1]++;
+//    colortick[2]++;
 
+    // Calculate only when needed  TODO add code later
 
 
     for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
-        if (colorFadeDiff > 0) {
+        colorFadeDiff[smallerCounter] = colorSeq[colorLocation+1][smallerCounter] - colorSeq[colorLocation][smallerCounter];
+        colorDiff[smallerCounter] = (double)colorFadeDiff[smallerCounter] / 1000;
+
+    }
+
+
+    Timer_A_stop(TIMER_A0_BASE);
+    initTimers(currentRGBColor[0] + colorFadeDiff[0] ,currentRGBColor[1] + colorFadeDiff[1],currentRGBColor[2] + colorFadeDiff[2]);
+
+    //colorLocation // Location of current color
+
+
+
+
+/*
+
+    for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+        if (colorFadeDiff[0][smallerCounter] > 0) {
             fadeDirection[smallerCounter] = 1;  // Count up
         }
         else {
             fadeDirection[smallerCounter] = 0; // Count down
         }
+
 
         switch (fadeDirection[smallerCounter]) {
 
@@ -217,7 +237,6 @@ __interrupt void timer_ISRB0 (void) {
                 currentRGBColor[smallerCounter] = currentRGBColor[smallerCounter]-1;
                 colortick[smallerCounter] = 0;
             }
-
         }
 
         }
@@ -226,6 +245,8 @@ __interrupt void timer_ISRB0 (void) {
     }
     Timer_A_stop(TIMER_A0_BASE);
     initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
+    */
+
     //    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
     //
     //    if (timerTick >= 100) {
@@ -307,60 +328,60 @@ __interrupt void timer_ISRB0 (void) {
 
 }
 //
-#pragma vector=TIMER0_B1_VECTOR
-__interrupt void timer_ISRB1 (void) {
-    //GPIO_toggleOutputOnPin( LED_PORT, LED_G );
-    Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_1);
+//#pragma vector=TIMER0_B1_VECTOR
+//__interrupt void timer_ISRB1 (void) {
+//    //GPIO_toggleOutputOnPin( LED_PORT, LED_G );
+//    Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_1);
+//
+//
+//}
 
-
-}
-
-#pragma vector=TIMER0_A1_VECTOR
-__interrupt void timer_ISR2 (void)
-{
-    GPIO_toggleOutputOnPin( GPIO_PORT_P4, GPIO_PIN7 );
-
-}
-
-#pragma vector=TIMER0_A0_VECTOR
-__interrupt void TIMER1_A0_ISR (void)
-
-{
-
-    //GPIO_toggleOutputOnPin( GPIO_PORT_P6, GPIO_PIN0 );
-    //**************************************************************************
-    // 4. Timer ISR and vector
-    //**************************************************************************
-    switch( __even_in_range( TA0IV, TA0IV_TAIFG )) {
-    case TA0IV_NONE: break;                 // (0x00) None
-    case TA0IV_TACCR1:                      // (0x02) CCR1 IFG
-        // GPIO_toggleOutputOnPin(LED_PORT, LED_G);
-        //    	 GPIO_toggleOutputOnPin( GPIO_PORT_P6, GPIO_PIN0 );
-        //          _no_operation();
-        break;
-    case TA0IV_TACCR2:                      // (0x04) CCR2 IFG
-        //    	 GPIO_setOutputHighOnPin( LED_PORT, LED_R );
-        // GPIO_toggleOutputOnPin( LED_PORT, LED_R );
-
-        //          _no_operation();
-        break;
-    case TA0IV_TACCR3:                      // (0x06) CCR3 IFG
-
-        //          _no_operation();
-        break;
-    case TA0IV_TACCR4:                      // (0x08) CCR4 IFG
-        _no_operation();
-        break;
-    case TA0IV_5: break;                    // (0x0A) Reserved
-    case TA0IV_6: break;                    // (0x0C) Reserved
-    case TA0IV_TAIFG:                       // (0x0E) TA0IFG - TAR overflow
-        // Toggle LED2 (Green) LED on/off
-
-        _no_operation();
-        break;
-    default: _never_executed();
-    }
-}
+//#pragma vector=TIMER0_A1_VECTOR
+//__interrupt void timer_ISR2 (void)
+//{
+//    GPIO_toggleOutputOnPin( GPIO_PORT_P4, GPIO_PIN7 );
+//
+//}
+//
+//#pragma vector=TIMER0_A0_VECTOR
+//__interrupt void TIMER1_A0_ISR (void)
+//
+//{
+//
+//    //GPIO_toggleOutputOnPin( GPIO_PORT_P6, GPIO_PIN0 );
+//    //**************************************************************************
+//    // 4. Timer ISR and vector
+//    //**************************************************************************
+//    switch( __even_in_range( TA0IV, TA0IV_TAIFG )) {
+//    case TA0IV_NONE: break;                 // (0x00) None
+//    case TA0IV_TACCR1:                      // (0x02) CCR1 IFG
+//        // GPIO_toggleOutputOnPin(LED_PORT, LED_G);
+//        //    	 GPIO_toggleOutputOnPin( GPIO_PORT_P6, GPIO_PIN0 );
+//        //          _no_operation();
+//        break;
+//    case TA0IV_TACCR2:                      // (0x04) CCR2 IFG
+//        //    	 GPIO_setOutputHighOnPin( LED_PORT, LED_R );
+//        // GPIO_toggleOutputOnPin( LED_PORT, LED_R );
+//
+//        //          _no_operation();
+//        break;
+//    case TA0IV_TACCR3:                      // (0x06) CCR3 IFG
+//
+//        //          _no_operation();
+//        break;
+//    case TA0IV_TACCR4:                      // (0x08) CCR4 IFG
+//        _no_operation();
+//        break;
+//    case TA0IV_5: break;                    // (0x0A) Reserved
+//    case TA0IV_6: break;                    // (0x0C) Reserved
+//    case TA0IV_TAIFG:                       // (0x0E) TA0IFG - TAR overflow
+//        // Toggle LED2 (Green) LED on/off
+//
+//        _no_operation();
+//        break;
+//    default: _never_executed();
+//    }
+//}
 
 ////***** Defines ***************************************************************
 //
