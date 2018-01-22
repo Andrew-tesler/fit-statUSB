@@ -11,6 +11,8 @@
 char timer = 0x00;
 int direction = 0;                                                                      // Direction of the fade
 
+uint8_t justCounter;
+uint8_t smallerCounter;
 
 
 uint16_t fadeTick = 0;              // Fade tick - Temp Value for the timer function, Each clock increment increments this value
@@ -68,24 +70,24 @@ void initTimers(int Red,int Green,int Blue) {
     Timer_A_initCompareModeParam initCompareParamcc1 = {0};
     initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
     initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+//    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc1.compareValue			= Red;
     //
     // Blue
     Timer_A_initCompareModeParam initCompareParamcc2 = {0};
     initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
     initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc2.compareValue			= Blue;
 
     // Red
     Timer_A_initCompareModeParam initCompareParamcc3 = {0};
     initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
     initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc3.compareValue			= Green;
     //
     Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -120,7 +122,7 @@ void initTimers(int Red,int Green,int Blue) {
 }
 
 // Fade the leds from given color to given color by the time given
-void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, long  time) {
+void initfadeClock() {
 
     Timer_B_initUpModeParam initTimer_b = {0};
 //    0xDCD;
@@ -140,14 +142,26 @@ void initfade(int sRed, int sGreen, int sBlue, int tRed, int tGreen, int tBlue, 
 
 
 // calculate  the time for the fade function
-void initFadeTime(uint32_t totalTime) {
+void updateFadeTime(uint32_t totalTime) {
 
     fadeTime = totalTime/fadeColorStep;                                         // Calculate fade step
 
 
-    initfade(0,0,0,0,0,0,0);
+   // initfade(0,0,0,0,0,0,0);
 
 
+}
+
+// Get the colors sequence and sequence number and initialize the fade command
+void initFade(uint8_t colorNum) {
+    // Calculate the difference between each fade sequence
+    for (justCounter = 0 ; justCounter < colorNum-1 ; justCounter++) {
+        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+            colorFadeDiff[justCounter][smallerCounter] = colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter];   // Calculate and store the difference
+            fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
+        }
+    }
+    initfadeClock();                                                                                                                        // Start Timer B0
 }
 //*****************************************************************************
 // Interrupt Service Routine
@@ -162,10 +176,13 @@ __interrupt void timer_ISRB0 (void) {
     initTimers(0x01,0x01,timer);
 
 
+
 //
+//
+////
 //    fadeTickGlobal = fadeTime/2;                                                  // TODO the 255 number will have to be the color diference of each led
 
-    if (fadeTick <= fadeTime) {                                                           // If the fade tick smaller that the calculted global
+    if (fadeTick <= fadeTimer) {                                                           // If the fade tick smaller that the calculted global
         //
         fadeTick++;
 
@@ -197,7 +214,7 @@ __interrupt void timer_ISRB0 (void) {
         }
 //
     }
-//
+////
 //                                                                 // Update the timer
 
 
