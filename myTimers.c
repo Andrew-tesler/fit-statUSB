@@ -8,6 +8,7 @@
 #include "myTimers.h"
 #include "defines.c"
 
+
 //char timer = 0x00;
 //int direction = 0;                                                                      // Direction of the fade
 //
@@ -30,7 +31,16 @@ uint8_t colortick;                                                              
 // Fade time between each fade intervals TODO Will need to use with color differential number
 //Total time of fade from one color to another
 
-void initTimers(int Red,int Green,int Blue) {
+void initTimers(int red,int green,int blue) {
+
+    uint8_t Red,Green,Blue;
+
+    if (red >= 0 & red <= 255)
+        Red = red;
+    if (green >= 0 & green <= 255)
+        Green = green;
+    if (blue >= 0 & blue <= 255)
+        Blue = blue;
 
     currentRGBColor[0] = Red;
     currentRGBColor[1] = Green;
