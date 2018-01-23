@@ -20,7 +20,7 @@ uint8_t colorsNumber;                                                           
 //
 //int colorCounter[MAX_SEQ_COLORS][3];                                                    // Counter for fade logic
 int colorLocation;                                                        // Which color currently fading for fade logic
-uint8_t colortick;                                                                   // Counter Tick for fade logic
+                                                                   // Counter Tick for fade logic
 //uint8_t fadeDirection[3];                                                               // Direction of LED to fade
 
 //uint8_t timerTick = 0;
@@ -35,6 +35,7 @@ void initTimers(int red,int green,int blue) {
 
     uint8_t Red,Green,Blue;
 
+    // Test for value correctness
     if (red >= 0 & red <= 255)
         Red = red;
     if (green >= 0 & green <= 255)
@@ -176,18 +177,24 @@ void updateFadeTime(uint32_t totalTime) {
 // Get the colors sequence and sequence number and initialize the fade command
 void initFade(uint8_t colorNum) {
     // Calculate the difference between each fade sequence
-//    for (justCounter = 0 ; justCounter < colorNum-1 ; justCounter++) {
-//        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
-//            colorFadeDiff[justCounter][smallerCounter] = colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter];   // Calculate and store the difference
-//            fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
-//        }
-//    }
+    //    for (justCounter = 0 ; justCounter < colorNum-1 ; justCounter++) {
+    //        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+    //            colorFadeDiff[justCounter][smallerCounter] = colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter];   // Calculate and store the difference
+    //            fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
+    //        }
+    //    }
 
     colorsNumber = colorNum;
     colortick = 0;                                                                                                                          // Clear time tick number
 
     initTimers(colorSeq[0][0], colorSeq[0][1], colorSeq[0][2]);                                                                             // Start the LED with the first color
     colorLocation = 0;
+
+    for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+        colorFadeDiff[smallerCounter] = colorSeq[colorLocation+1][smallerCounter] - colorSeq[colorLocation][smallerCounter];
+        colorDiff[smallerCounter] = colorFadeDiff[smallerCounter] / fadeTimer;
+
+    }
 
     initfadeClock();                                                                                                                        // Start Timer B0
 }
@@ -200,28 +207,24 @@ __interrupt void timer_ISRB0 (void) {
     // the timer should run and update the PWM clock(TIMERA0) if any change needed
     // Because of several fade values present the script will also need to iterate on the array of colors
     colortick++;
-//    colortick[1]++;
-//    colortick[2]++;
+    //    colortick[1]++;
+    //    colortick[2]++;
 
     // Calculate only when needed  TODO add code later
 
 
-    for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
-        colorFadeDiff[smallerCounter] = colorSeq[colorLocation+1][smallerCounter] - colorSeq[colorLocation][smallerCounter];
-        colorDiff[smallerCounter] = (double)colorFadeDiff[smallerCounter] / 1000;
 
-    }
 
 
     Timer_A_stop(TIMER_A0_BASE);
-    initTimers(currentRGBColor[0] + colorFadeDiff[0] ,currentRGBColor[1] + colorFadeDiff[1],currentRGBColor[2] + colorFadeDiff[2]);
-
+    //initTimers(currentRGBColor[0] + colorFadeDiff[0] ,currentRGBColor[1] + colorFadeDiff[1],currentRGBColor[2] + colorFadeDiff[2]);
+//    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
     //colorLocation // Location of current color
+    Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_0);
 
 
 
-
-/*
+    /*
 
     for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
         if (colorFadeDiff[0][smallerCounter] > 0) {
@@ -255,7 +258,7 @@ __interrupt void timer_ISRB0 (void) {
     }
     Timer_A_stop(TIMER_A0_BASE);
     initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
-    */
+     */
 
     //    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
     //
@@ -334,7 +337,7 @@ __interrupt void timer_ISRB0 (void) {
     //
      *
      */
-    Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_0);
+
 
 }
 //

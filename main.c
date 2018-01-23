@@ -171,7 +171,7 @@ void main (void)
 
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
-    fadeTimer = 1000;                                                                                    // Default timer 300ms
+    fadeTimer = 1020;                                                                                    // Default timer 300ms
 
     __bis_SR_register( GIE );                                                                           // Enable interrupts globally
 
