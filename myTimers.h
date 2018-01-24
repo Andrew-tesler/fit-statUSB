@@ -8,7 +8,8 @@
 #ifndef MYTIMERS_H_
 #define MYTIMERS_H_
 
-uint32_t fadeTimer;
+float fadeTimer;
+
 uint32_t colortick;
 
 // TODO add colorSeq and colorFadeDiff initialization to 0
@@ -18,9 +19,9 @@ int colorSeq[MAX_SEQ_COLORS][3];                                                
 //signed int fadeTimeMs[MAX_SEQ_COLORS][3];                                                 // QTY in MS needed to pass for the color to change
 
 
-double currentRGBColor[3];                                                                     // Current Color
-double colorDiff[3];
-int colorFadeDiff[3];
+float currentRGBColor[3];                                                                     // Current Color
+//double colorDiff[3];
+float colorFadeDiff[MAX_SEQ_COLORS][3];
 
 
 // Prototypes

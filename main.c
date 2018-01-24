@@ -301,7 +301,7 @@ void main (void)
 
                         fadeTimer = parseFadeTimer(unformatedFade,counterFade);                         // Convert the User Input to decimal numbers
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
-
+                        updateFadeTime(fadeTimer);          // TODO test
                         // Restart the fade function with the designated fade time
                         //initFadeTime(fadeTimer);// TODO add function that updates the timer
                         strcpy(outString,"\r\nSet fading period, OK\r\n\r\n");                          // Prepare String for the user
