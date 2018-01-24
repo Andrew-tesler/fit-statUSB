@@ -19,7 +19,8 @@ uint8_t smallerCounter;
 uint8_t colorsNumber;                                                                   // Number of colors transition
 //
 //int colorCounter[MAX_SEQ_COLORS][3];                                                    // Counter for fade logic
-int colorLocation;                                                        // Which color currently fading for fade logic
+uint32_t colorLocation;                                                        // Which color currently fading for fade logic
+uint8_t direction = 0;
 // Counter Tick for fade logic
 //uint8_t fadeDirection[3];                                                               // Direction of LED to fade
 
@@ -200,6 +201,35 @@ void initFade(uint8_t colorNum) {
 
     initfadeClock();                                                                                                                        // Start Timer B0
 }
+
+// Function to be called by TIMER0_B0 that will update the current color according to calculated values
+void updateFadeColor(){
+    Timer_A_stop(TIMER_A0_BASE);// Stop Timer
+
+
+    switch (direction) {
+    case 0: {
+        currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[0][0];
+        currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[0][1];
+        currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[0][2];
+        break;
+    }
+
+    case 1: {
+        currentRGBColor[0] =   currentRGBColor[0] - colorFadeDiff[0][0];
+        currentRGBColor[1] =   currentRGBColor[1] - colorFadeDiff[0][1];
+        currentRGBColor[2] =   currentRGBColor[2] - colorFadeDiff[0][2];
+        break;
+    }
+    }
+
+
+
+
+    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
+
+
+}
 //*****************************************************************************
 // Interrupt Service Routine
 //*****************************************************************************
@@ -211,14 +241,20 @@ __interrupt void timer_ISRB0 (void) {
     //colortick++;
     //    colortick[1]++;
     //    colortick[2]++;
+    updateFadeColor();
+    colorLocation++;
 
+    if (colorLocation == fadeTimer){
+        direction = !direction;
+        colorLocation=0;
+    }
     // Calculate only when needed  TODO add code later
 
 
 
 
 
-    Timer_A_stop(TIMER_A0_BASE);
+
     //initTimers(colorSeq[colortick][0], colorSeq[0][1], colorSeq[0][2]);
     //initTimers(currentRGBColor[0] + colorFadeDiff[0] ,currentRGBColor[1] + colorFadeDiff[1],currentRGBColor[2] + colorFadeDiff[2]);
     //    initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
