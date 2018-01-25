@@ -93,24 +93,24 @@ void initTimers(int red,int green,int blue) {
     Timer_A_initCompareModeParam initCompareParamcc1 = {0};
     initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
     initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    //    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+//    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+        initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc1.compareValue			= Red;
     //
     // Blue
     Timer_A_initCompareModeParam initCompareParamcc2 = {0};
     initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
     initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    //    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+        initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc2.compareValue			= Blue;
 
     // Red
     Timer_A_initCompareModeParam initCompareParamcc3 = {0};
     initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
     initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    //    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+        initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc3.compareValue			= Green;
     //
     Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
