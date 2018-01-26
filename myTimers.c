@@ -190,6 +190,9 @@ void initFade(uint8_t colorNum) {
 
     initTimers(colorSeq[0][0], colorSeq[0][1], colorSeq[0][2]);                                                                             // Start the LED with the first color
     colorLocation = 0;
+    currentRGBColor[0] = colorSeq[0][0];
+    currentRGBColor[1] = colorSeq[0][1];
+    currentRGBColor[2] = colorSeq[0][2];
 
     for (justCounter = 0 ; justCounter < MAX_SEQ_COLORS ; justCounter++) {
         for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
