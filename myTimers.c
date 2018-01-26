@@ -20,7 +20,7 @@ uint8_t colorsNumber;                                                           
 //
 //int colorCounter[MAX_SEQ_COLORS][3];                                          // Counter for fade logic
 uint32_t colorLocation;                                                         // Color location in the fade difference array
-uint8_t direction = 0;                                                          // Direction of the Loop 0 - Forward, 1 - Backward
+int direction = 0;                                                          // Direction of the Loop 0 - Forward, 1 - Backward
 uint8_t fadeArrayLocation;                                                      // Location in fadeArrayDiff array
 //uint8_t fadeArrayDirection;                                                     // Probably not needed
 // Counter Tick for fade logic
@@ -200,17 +200,43 @@ void updateFadeColor(){
 __interrupt void timer_ISRB0 (void) {
     // the timer should run and update the PWM clock(TIMERA0) if any change needed
     // Because of several fade values present the script will also need to iterate on the array of colors
-    //colortick++;
-    //    colortick[1]++;
-    //    colortick[2]++;
+
+
+    // colorFadeDiff -- Fade diff array location
+    // colorLocation -- Color location in each of the fade diff array colors
+    // direction     -- Direction of the fade
+    // colorsNumber  -- Total number of array size of fade diff
     updateFadeColor();
+
     colorLocation++;
 
 
-    if (colorLocation == fadeTimer){
-        direction = !direction;
-        colorLocation=0;
-    }
+    if (colorLocation >= fadeTimer){   // Test if the array of the color reached its limits
+        switch (direction) {
+        case 0: {   // Move forward
+                        if (fadeArrayLocation < colorsNumber){
+            fadeArrayLocation++;
+                        }
 
+            colorLocation=0;
+            break;
+        }
+        case 1: {  // Move backward
+            if (fadeArrayLocation > 0) {
+                fadeArrayLocation--;
+            }
+            colorLocation=0;
+            break;
+        }
+
+
+        }
+        if (fadeArrayLocation == colorsNumber || fadeArrayLocation == 0) {
+            direction = !direction;
+            //colorLocation=0;
+        }
+
+
+    }
     Timer_B_clearCaptureCompareInterrupt(TIMER_B0_BASE, TIMER_B_CAPTURECOMPARE_REGISTER_0);
 }
