@@ -14,13 +14,15 @@
 //
 //unsigned int timerBcounter[3];                                                          // Counter for each of the colors
 //
-uint8_t justCounter;
-uint8_t smallerCounter;
-uint8_t colorsNumber;                                                                   // Number of colors transition
+uint8_t justCounter;                                                            // Counter for the for loop
+uint8_t smallerCounter;                                                         // Counter for the dor loop used for RGB iterration
+uint8_t colorsNumber;                                                           // Number of colors transition
 //
-//int colorCounter[MAX_SEQ_COLORS][3];                                                    // Counter for fade logic
-uint32_t colorLocation;                                                        // Which color currently fading for fade logic
-uint8_t direction = 0;
+//int colorCounter[MAX_SEQ_COLORS][3];                                          // Counter for fade logic
+uint32_t colorLocation;                                                         // Color location in the fade difference array
+uint8_t direction = 0;                                                          // Direction of the Loop 0 - Forward, 1 - Backward
+uint8_t fadeArrayLocation;                                                      // Location in fadeArrayDiff array
+//uint8_t fadeArrayDirection;                                                     // Probably not needed
 // Counter Tick for fade logic
 //uint8_t fadeDirection[3];                                                               // Direction of LED to fade
 
@@ -34,32 +36,25 @@ uint8_t direction = 0;
 
 void initTimers(int red,int green,int blue) {
 
-    uint8_t Red,Green,Blue;
+    uint8_t Red,Green,Blue;                                                     // Initialize RGB Int's
 
     // Test for value correctness
-    if (red >= 0 & red <= 255)
+    if (red >= 0 & red <= 255)                                                  // Check for Correct color numbers and pass only them
         Red = red;
     if (green >= 0 & green <= 255)
         Green = green;
     if (blue >= 0 & blue <= 255)
         Blue = blue;
 
+    if (Red == 0) {
+           GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R); /// Input power off the RED led
+       }
+
     //    currentRGBColor[0] = Red;
     //    currentRGBColor[1] = Green;
     //    currentRGBColor[2] = Blue;
-    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
-    //
-    //	Timer_A_initUpDownModeParam initUpDownParam = {0};
-    //	initUpDownParam.clockSource								= TIMER_A_CLOCKSOURCE_SMCLK;
-    //	initUpDownParam.clockSourceDivider						= TIMER_A_CLOCKSOURCE_DIVIDER_1;
-    //	initUpDownParam.timerInterruptEnable_TAIE				= TIMER_A_TAIE_INTERRUPT_DISABLE;
-    //	initUpDownParam.captureCompareInterruptEnable_CCR0_CCIE = TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
-    //	initUpDownParam.timerPeriod 							= 0xFF;
-    //	initUpDownParam.timerClear								= TIMER_A_DO_CLEAR;
-    //	initUpDownParam.startTimer								= false;
 
-
-
+    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);// Set the RGB LED GPIO to alternative function to power the LEDS directly from timer
 
 
     Timer_A_initUpModeParam initParam2 = {0};
@@ -72,22 +67,8 @@ void initTimers(int red,int green,int blue) {
     initParam2.timerClear				= TIMER_A_DO_CLEAR;
     initParam2.startTimer				= false;
 
-    //	Timer_A_initContinuousModeParam initParam = {0};
-    //	initParam.clockSource 				= TIMER_A_CLOCKSOURCE_SMCLK;
-    //	initParam.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_1;
-    //	initParam.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_ENABLE;
-    //	initParam.timerClear				= TIMER_A_DO_CLEAR;
-    //	initParam.startTimer				= true;
-
-
-    //		Timer_A_initUpDownMode(TIMER_A0_BASE,&initUpDownParam);
 
     Timer_A_initUpMode(TIMER_A0_BASE,&initParam2);
-
-    //	Timer_A_initContinuousMode(TIMER_A0_BASE,&initParam);
-
-    //TIMER_A_OUTPUTMODE_SET_RESET  // fitstatusb
-    //TIMER_A_OUTPUTMODE_TOGGLE_SET // ARDUMSP
 
     // Green
     Timer_A_initCompareModeParam initCompareParamcc1 = {0};
@@ -129,19 +110,13 @@ void initTimers(int red,int green,int blue) {
     Timer_A_startCounter(TIMER_A0_BASE,TIMER_A_UP_MODE);
 
 
-    if (Red == 0) {
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R); /// Input power off the RED led
-    }
 
 
 
 
 
-    //
-    //	    Timer_A_startCounter(
-    //	        TIMER_A0_BASE,
-    //	        TIMER_A_CONTINUOUS_MODE
-    //	    );
+
+
 }
 
 // Fade the leds from given color to given color by the time given
@@ -187,14 +162,15 @@ void initFade(uint8_t colorNum) {
 
     colorsNumber = colorNum;
     colortick = 0;                                                                                                                          // Clear time tick number
-
+    fadeArrayLocation = 0;
+//    fadeArrayDirection = 0;
     initTimers(colorSeq[0][0], colorSeq[0][1], colorSeq[0][2]);                                                                             // Start the LED with the first color
     colorLocation = 0;
     currentRGBColor[0] = colorSeq[0][0];
     currentRGBColor[1] = colorSeq[0][1];
     currentRGBColor[2] = colorSeq[0][2];
 
-    for (justCounter = 0 ; justCounter < MAX_SEQ_COLORS ; justCounter++) {
+    for (justCounter = 0 ; justCounter < MAX_SEQ_COLORS-1 ; justCounter++) {
         for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
 
             colorFadeDiff[justCounter][smallerCounter] = (colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter]) / fadeTimer;
@@ -212,21 +188,19 @@ void updateFadeColor(){
 
     switch (direction) {
     case 0: {
-        currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[0][0];
-        currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[0][1];
-        currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[0][2];
+        currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
+        currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
+        currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
         break;
     }
 
     case 1: {
-        currentRGBColor[0] =   currentRGBColor[0] - colorFadeDiff[0][0];
-        currentRGBColor[1] =   currentRGBColor[1] - colorFadeDiff[0][1];
-        currentRGBColor[2] =   currentRGBColor[2] - colorFadeDiff[0][2];
+        currentRGBColor[0] =   currentRGBColor[0] - colorFadeDiff[fadeArrayLocation][0];
+        currentRGBColor[1] =   currentRGBColor[1] - colorFadeDiff[fadeArrayLocation][1];
+        currentRGBColor[2] =   currentRGBColor[2] - colorFadeDiff[fadeArrayLocation][2];
         break;
     }
     }
-
-
 
 
     initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
@@ -246,6 +220,7 @@ __interrupt void timer_ISRB0 (void) {
     //    colortick[2]++;
     updateFadeColor();
     colorLocation++;
+
 
     if (colorLocation == fadeTimer){
         direction = !direction;
