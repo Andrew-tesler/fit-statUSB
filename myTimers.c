@@ -16,7 +16,7 @@
 //
 uint8_t justCounter;                                                            // Counter for the for loop
 uint8_t smallerCounter;                                                         // Counter for the dor loop used for RGB iterration
-uint8_t colorsNumber;                                                           // Number of colors transition
+int colorsNumber;                                                           // Number of colors transition
 //
 //int colorCounter[MAX_SEQ_COLORS][3];                                          // Counter for fade logic
 uint32_t colorLocation;                                                         // Color location in the fade difference array
@@ -155,7 +155,7 @@ void initFade(uint8_t colorNum) {
     currentRGBColor[1] = colorSeq[0][1];
     currentRGBColor[2] = colorSeq[0][2];
 
-    for (justCounter = 0 ; justCounter < MAX_SEQ_COLORS-1 ; justCounter++) {
+    for (justCounter = 0 ; justCounter < colorsNumber-1 ; justCounter++) {
         for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
 
             colorFadeDiff[justCounter][smallerCounter] = (colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter]) / fadeTimer;
@@ -212,11 +212,13 @@ __interrupt void timer_ISRB0 (void) {
 
 
     if (colorLocation >= fadeTimer){   // Test if the array of the color reached its limits
+
         switch (direction) {
+
         case 0: {   // Move forward
-                        if (fadeArrayLocation < colorsNumber){
-            fadeArrayLocation++;
-                        }
+            if (fadeArrayLocation < colorsNumber-1){
+                fadeArrayLocation++;
+            }
 
             colorLocation=0;
             break;
@@ -229,12 +231,12 @@ __interrupt void timer_ISRB0 (void) {
             break;
         }
 
-
         }
-        if (fadeArrayLocation == colorsNumber || fadeArrayLocation == 0) {
+        if (fadeArrayLocation == colorsNumber-1 || fadeArrayLocation == 0) {
             direction = !direction;
             //colorLocation=0;
         }
+
 
 
     }
