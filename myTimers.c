@@ -130,21 +130,12 @@ void initfadeClock() {
 // calculate  the time for the fade function
 void updateFadeTime(uint32_t totalTime) {
 
-    // initfade(0,0,0,0,0,0,0);
     fadeTimer = totalTime;
     initFade(colorsNumber);
 }
 
 // Get the colors sequence and sequence number and initialize the fade command
 void initFade(uint8_t colorNum) {
-    // Calculate the difference between each fade sequence
-    //    for (justCounter = 0 ; justCounter < colorNum-1 ; justCounter++) {
-    //        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
-    //            colorFadeDiff[justCounter][smallerCounter] = colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter];   // Calculate and store the difference
-    //            fadeTimeMs[justCounter][smallerCounter] = fadeTimer / (double)colorFadeDiff[justCounter][smallerCounter];                       // Calculate and store the time parameter to fade
-    //        }
-    //    }
-
     colorsNumber = colorNum;
     colortick = 0;                                                                                                                          // Clear time tick number
     fadeArrayLocation = 0;
