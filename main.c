@@ -171,7 +171,7 @@ void main (void)
 
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
-    fadeTimer = 10;                                                                                    // Default timer 300ms
+    fadeTimer = 10024;                                                                                    // Default timer 300ms
 
     __bis_SR_register( GIE );                                                                           // Enable interrupts globally
 
@@ -373,6 +373,169 @@ void main (void)
                             unformatedFade[i] = 0x00;
                         }
                     }
+                    /*
+                    switch(wholeString[0]) {
+                    case '@' :                                                                          // Set The led color based on String argument TODO Remove in final version
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        allOff();
+//                        ledOn(wholeString[1]);                                                          // Function to set the LEDs
+                        strcpy(outString,"\r\nLED is ON--Suspended function\r\n\r\n");                                      // Prepare String for Console print
+
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);                  // Send the String to USB Console
+                        break;
+
+                    case '#' :                                                                          // Set Led color #RRGGBB
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+                        // Convert to Hex received Red values
+                        sprintf(buffer,"%d", wholeString[1]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[2]);
+                        ones = chrToHx(atol(buffer));
+
+
+                        tens = (tens << 4);
+                        tempR = tens|ones;
+
+                        // Convert to HEX received Green values
+                        sprintf(buffer, "%d", wholeString[3]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[4]);
+                        ones = chrToHx(atol(buffer));
+
+                        tens = (tens << 4);
+                        tempG = tens|ones;
+
+                        // Convert to HEX received Blue values
+                        sprintf(buffer, "%d", wholeString[5]);
+                        tens = chrToHx(atol(buffer));
+                        sprintf(buffer,"%d", wholeString[6]);
+                        ones = chrToHx(atol(buffer));
+
+                        tens = (tens << 4);
+                        tempB = tens|ones;
+
+                        // Send to the fade function
+                        initTimers(tempR,tempG,tempB);
+
+                        strcpy(outString,"\r\nPressed Fade Command\r\n\r\n");
+                        // Send the String to USB
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+                    case 'B' :
+                        Timer_A_stop(TIMER_A0_BASE);
+                        Timer_B_stop(TIMER_B0_BASE);
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set GPIO Pin alternative function to blink directly from timer
+                        allOff();
+                        initfade(0,0,0,0,0,0,0);
+                        // Set color sequence transition from one color to another issue #8
+                        strcpy(outString,"\r\n… Set color sequence\r\n\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                                            strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+                    case '?' :
+                        // Return fit-statUSB ID
+                        // Return the Serial number of the device As reported by USB API
+                        USBCDC_sendDataInBackground((uint8_t*)abramSerialStringDescriptor,
+                                                    34,CDC0_INTFNUM,0);
+                        break;
+
+
+                    case 'F':
+                        // Set fading (transition) period in ms
+                        // TODO Add global value that will serve as the global value for the transition time when set color sequence is called
+                        Timer_B_stop(TIMER_B0_BASE);                                                    // Stop timer
+                        // Find the Decimal number to fade in the Buffer
+                        timetoFade=0;                                                                   // Initialize time to fade value
+                        maxTimeToFade = 1;                                                              // Initialize Max time to fade
+                        fadeCounter=0;                                                                  // Initialize fade counter
+                        // Max 6 Digits
+                        for (i=0;i <= 6 ; i++) {                                                        // For loop that extract decimals from user input
+                            if (wholeString[i+1] >= '0' && wholeString[i+1] <= '9') {
+                                fadeCounter++;                                                          // Increment counter to be used in the next for loop
+                                timeBuffer[i] = chrToHx(wholeString[i+1]);                              // Store to buffer the converted decimal number
+                                maxTimeToFade = maxTimeToFade*10;                                       // Increment the max time to fade decimal places
+                            }
+                        }
+                        for (i = 0 ; i <= fadeCounter ; i++ ) {                                         // For loop that calculate the time fade value and store it
+                            maxTimeToFade = maxTimeToFade/10;                                           // Multiply the timer digits
+                            timetoFade = timetoFade + (timeBuffer[i]*maxTimeToFade);
+                        }
+
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
+                        GPIO_setAsInputPin(LED_PORT, LED_R);                                            // TODO disabled Red LED for debuging
+                        initFadeTime(timetoFade);
+                        strcpy(outString,"\r\nSet fading period\r\n\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+
+                    case 'G':
+                        // get current color
+                        // TODO should be some value that is stored in the internal device Flash
+                        // Returns print #RRGGBB
+
+                        strcpy(outString,"\r\nDevice color #RRGGBB\r\n\r\n");
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+                    case '-' :
+
+                        if (wholeString[1] == 'P') {
+                            strcpy(outString,"\r\nPrograming mode\r\n\r\n");
+                            // Send String here the USB will kill itself next
+                            USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                        strlen(outString),CDC0_INTFNUM,0);
+                            Timer_B_stop(TIMER_B0_BASE);
+                            Timer_A_stop(TIMER_A0_BASE);
+                            // Programming mode
+                            USB_disconnect();                           // Disconnect USB device
+                            __disable_interrupt();                      // Disable global interrupt
+                            ((void (*)())0x1000)();                     // Set the bsl address
+                            USB_connect();                              // Connect the USB back on
+
+                        }
+                        /// Test If for String outputs // TODO remove in final version
+                        else if (wholeString[1] =='T') {
+
+                            USBCDC_sendDataInBackground((uint8_t*)deviceSN,
+                                                        strlen(deviceSN),CDC0_INTFNUM,0);
+                        }
+
+                        else if (wholeString[1] =='H') {
+                            printHelp();
+                        }
+
+
+                        else {
+                            // Prepare the String
+                            strcpy(outString,"\r\nPressed Command String\r\n\r\n");
+                        }
+                        // Send the String to USB
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+
+                    default :
+                        strcpy(outString,"\n");                                                         // Send new Line when return pressed
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
+                    }
+
+                    // Clear the string in preparation for the next one
+                    for (i = 0; i < MAX_STR_LENGTH; i++){
+                        wholeString[i] = 0x00;
+                    }
+                     */
                 }
 
 
