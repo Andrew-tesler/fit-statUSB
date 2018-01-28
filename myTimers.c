@@ -37,27 +37,39 @@ uint8_t fadeArrayLocation;                                                      
 void initTimers(int red,int green,int blue) {
 
     uint8_t Red,Green,Blue;                                                     // Initialize RGB Int's
-
+    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);// Set the RGB LED GPIO to alternative function to power the LEDS directly from timer
     // Test for value correctness
-    if (red >= 0 & red <= 255)                                                  // Check for Correct color numbers and pass only them
+    if (red > 0 & red <= 255){                                                  // Check for Correct color numbers and pass only them
         Red = red;
-    if (green >= 0 & green <= 255)
+    }
+    else {
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R);
+    }
+    if (green > 0 & green <= 255){
         Green = green;
-    if (blue >= 0 & blue <= 255)
+    }
+    else {
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_G);
+    }
+    if (blue > 0 & blue <= 255){
         Blue = blue;
-
-    if (Red == 0) {                                                             // Fix the LED red Powering ON when not in use
-        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R);     // Input power off the RED led
+    }
+    else {
+        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_B);
     }
 
+//    if (Red <= 0) {                                                             // Fix the LED red Powering ON when not in use
+//        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R);     // Input power off the RED led
+//    }
 
-    GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);// Set the RGB LED GPIO to alternative function to power the LEDS directly from timer
+
+
 
 
     Timer_A_initUpModeParam initParam2 = {0};
     //
     initParam2.clockSource				= TIMER_A_CLOCKSOURCE_SMCLK;
-    initParam2.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_10;
+    initParam2.clockSourceDivider		= TIMER_A_CLOCKSOURCE_DIVIDER_24;
     initParam2.timerInterruptEnable_TAIE = TIMER_A_TAIE_INTERRUPT_DISABLE;
     initParam2.captureCompareInterruptEnable_CCR0_CCIE	= TIMER_A_CCIE_CCR0_INTERRUPT_DISABLE;
     initParam2.timerPeriod				= 0xFF;
