@@ -237,6 +237,7 @@ void main (void)
                     switch(wholeString[0]) {
                     // Enter device USB BSL mode for program updates.
                     case 'P' : {
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);
                         strcpy(outString,"\r\nEntering device Programming mode - Remove the device after programming\r\n\r\n");
                         // Send String here the USB will kill itself next
                         USBCDC_sendDataInBackground((uint8_t*)outString,
