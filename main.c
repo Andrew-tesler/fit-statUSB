@@ -171,7 +171,12 @@ void main (void)
 
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
-    fadeTimer = 300;                                                                                    // Default timer 300ms
+    //fadeTimer = 300;                                                                                    // Default timer 300ms
+    colorFadeTimer[0] = 300;
+    colorSeq[0][0] = 0;
+    colorSeq[0][1] = 0;
+    colorSeq[0][2] = 0;
+
 
     __bis_SR_register( GIE );                                                                           // Enable interrupts globally
 
@@ -256,7 +261,7 @@ void main (void)
                     case '#' : {
                         Timer_A_stop(TIMER_A0_BASE);                                                    // Stop Timer A0
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop Timer B0
-                        //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative mode for GPIO LEDS
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative mode for GPIO LEDS
                         // Store the data to array
                         for (i=0;i<=MAX_FADE_DECIMAL;i++) {                                                             // Store the unformatted data to color array
                             if (wholeString[i+1] == 0x00) {
@@ -265,11 +270,25 @@ void main (void)
                             incomingColor[i] = wholeString[i+1];                                        // The first string is the switch case command
 
                         }
-                        converIncomingColor();                                                          // Convert the unformatted data in temp array to formated decimals
-                        currentRGBColor[0] = formatedColor[0];
-                        currentRGBColor[1] = formatedColor[1];
-                        currentRGBColor[2] = formatedColor[2];
-                        initTimers(formatedColor[0],formatedColor[1],formatedColor[2]);                 // Start the timers with the formated information
+
+                        disableDirection = 1;
+                        direction = 0;
+                        converIncomingColor();
+
+                        colorSeq[0][0] =  colorSeq[1][0];
+                        colorSeq[0][1] =  colorSeq[1][1];
+                        colorSeq[0][2] =  colorSeq[1][2];
+
+                        colorSeq[1][0] = formatedColor[0];
+                        colorSeq[1][1] = formatedColor[1];
+                        colorSeq[1][2] = formatedColor[2];
+                                                                                  // Convert the unformatted data in temp array to formated decimals
+                        initFade(2);
+
+
+
+
+                        //initTimers(formatedColor[0],formatedColor[1],formatedColor[2]);                 // Start the timers with the formated information
 
                         // Test
                         strcpy(outString,"\r\nSet Color, OK \r\n");                                     // Prepare String to send
@@ -297,7 +316,7 @@ void main (void)
                     // Ftttt - default = 0300 (300 mS)
                     case 'F' : {
                         //int unformatedFadeTimer[5] = {1,11,22,2,2};
-                        Timer_B_stop(TIMER_B0_BASE);                                                    // Stop Timer B0
+                        //Timer_B_stop(TIMER_B0_BASE);                                                    // Stop Timer B0
                         int counterFade = 0;                                                            // Counter for how many actually numbers recived
                         // && wholeString[i+1] <= 9
                         for (i=0;i<MAX_FADE_DECIMAL;i++) {                                              // parse incoming text and store only the fade numbers
@@ -307,9 +326,11 @@ void main (void)
                             }
                         }
 
-                        fadeTimer = parseFadeTimer(unformatedFade,counterFade);                         // Convert the User Input to decimal numbers
-                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
-                        updateFadeTime(fadeTimer);          // TODO test
+
+                        direction = 0;
+                        colorFadeTimer[0] = parseFadeTimer(unformatedFade,counterFade);                         // Convert the User Input to decimal numbers
+                        //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
+                        //updateFadeTime(fadeTimer);          // TODO test
                         // Restart the fade function with the designated fade time
                         //initFadeTime(fadeTimer);// TODO add function that updates the timer
                         strcpy(outString,"\r\nSet fading period, OK\r\n\r\n");                          // Prepare String for the user
@@ -327,6 +348,7 @@ void main (void)
                         seqCounter = 0 ;                                                                // Reset Sequence color
                         int counterFade = 0;
                         int fadeTimeCounter = 0;
+                        disableDirection = 0;
 
                         //                        MAX_STR_LENGTH
                         for (wholeStringCounter = 0 ; wholeStringCounter < MAX_STR_LENGTH ; wholeStringCounter ++) {                                       // Pass on the whole array of incoming data
@@ -364,7 +386,7 @@ void main (void)
                             }
 
                         }
-                                       // Start the timers with the formated information
+                        // Start the timers with the formated information
                         initFade(seqCounter);
 
                         // Test
@@ -617,7 +639,7 @@ void printHelp() {
                                 strlen(outString),CDC0_INTFNUM,0);
 
 
-    strcpy(outString,"\nFirmware Revision: V0.8.3\n\n\r");
+    strcpy(outString,"\nFirmware Revision: V0.8.4\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);

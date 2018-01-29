@@ -23,8 +23,9 @@ float currentRGBColor[3];                                                       
 //double colorDiff[3];
 float colorFadeDiff[MAX_SEQ_COLORS][3];
 float colorFadeTimer[MAX_SEQ_COLORS];                                               // Faded timer of each fade
-
-
+uint32_t colorLocation;                                                         // Color location in the fade difference array
+uint8_t disableDirection;
+int direction;                                                          // Direction of the Loop 0 - Forward, 1 - Backward
 // Prototypes
 void initTimers(int,int,int);
 void initfadeClock(void);

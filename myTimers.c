@@ -19,8 +19,8 @@ int smallerCounter;                                                         // C
 int colorsNumber;                                                           // Number of colors transition
 //
 //int colorCounter[MAX_SEQ_COLORS][3];                                          // Counter for fade logic
-uint32_t colorLocation;                                                         // Color location in the fade difference array
-int direction = 0;                                                          // Direction of the Loop 0 - Forward, 1 - Backward
+
+
 uint8_t fadeArrayLocation;                                                      // Location in fadeArrayDiff array
 //uint8_t fadeArrayDirection;                                                     // Probably not needed
 // Counter Tick for fade logic
@@ -223,6 +223,9 @@ __interrupt void timer_ISRB0 (void) {
 
     if (colorLocation >= colorFadeTimer[fadeArrayLocation]){   // Test if the array of the color reached its limits
 
+        if (disableDirection == 1) {
+            Timer_B_stop(TIMER_B0_BASE);
+        }
         switch (direction) {
 
         case 0: {   // Move forward
