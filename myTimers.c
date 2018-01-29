@@ -14,8 +14,8 @@
 //
 //unsigned int timerBcounter[3];                                                          // Counter for each of the colors
 //
-uint8_t justCounter;                                                            // Counter for the for loop
-uint8_t smallerCounter;                                                         // Counter for the dor loop used for RGB iterration
+int justCounter;                                                            // Counter for the for loop
+int smallerCounter;                                                         // Counter for the dor loop used for RGB iterration
 int colorsNumber;                                                           // Number of colors transition
 //
 //int colorCounter[MAX_SEQ_COLORS][3];                                          // Counter for fade logic
@@ -58,9 +58,9 @@ void initTimers(int red,int green,int blue) {
         GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_B);
     }
 
-//    if (Red <= 0) {                                                             // Fix the LED red Powering ON when not in use
-//        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R);     // Input power off the RED led
-//    }
+    //    if (Red <= 0) {                                                             // Fix the LED red Powering ON when not in use
+    //        GPIO_setAsPeripheralModuleFunctionInputPin(GPIO_PORT_P1, LED_R);     // Input power off the RED led
+    //    }
 
 
 
@@ -83,24 +83,24 @@ void initTimers(int red,int green,int blue) {
     Timer_A_initCompareModeParam initCompareParamcc1 = {0};
     initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
     initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-            initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    //    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc1.compareValue			= Red;
     //
     // Blue
     Timer_A_initCompareModeParam initCompareParamcc2 = {0};
     initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
     initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-            initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    //    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc2.compareValue			= Blue;
 
     // Red
     Timer_A_initCompareModeParam initCompareParamcc3 = {0};
     initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
     initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-            initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+    //    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc3.compareValue			= Green;
     //
     Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -159,10 +159,16 @@ void initFade(uint8_t colorNum) {
     currentRGBColor[1] = colorSeq[0][1];
     currentRGBColor[2] = colorSeq[0][2];
 
+    // Debug
+    //colorFadeTimer[0] = 1000;
+    //    colorFadeTimer[1] = 200;;
+    //    colorFadeTimer[2] = 3000;
+    //    colorFadeTimer[3] = 20;
+
     for (justCounter = 0 ; justCounter < colorsNumber-1 ; justCounter++) {
         for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
 
-            colorFadeDiff[justCounter][smallerCounter] = (colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter]) / fadeTimer;
+            colorFadeDiff[justCounter][smallerCounter] = (colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter]) / colorFadeTimer[justCounter];
 
         }
     }
@@ -215,7 +221,7 @@ __interrupt void timer_ISRB0 (void) {
     colorLocation++;
 
 
-    if (colorLocation >= fadeTimer){   // Test if the array of the color reached its limits
+    if (colorLocation >= colorFadeTimer[fadeArrayLocation]){   // Test if the array of the color reached its limits
 
         switch (direction) {
 

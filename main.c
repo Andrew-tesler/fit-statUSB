@@ -91,7 +91,7 @@ char wholeString[MAX_STR_LENGTH] = "";                                          
 char pieceOfString[MAX_STR_LENGTH] = "";                                                                // Holds the new addition to the string
 char outString[MAX_STR_LENGTH] = "";                                                                    // Holds the outgoing string
 char deviceSN[12];
-
+long wholeStringCounter;
 // *************************************** New Flow declarations and Misc *****************************
 
 
@@ -325,18 +325,19 @@ void main (void)
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop Timer B0
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative mode for GPIO LEDS
                         seqCounter = 0 ;                                                                // Reset Sequence color
-                        //                        MAX_STR_LENGTH
-                        for (i = 0 ; i < MAX_STR_LENGTH ; i ++) {                                       // Pass on the whole array of incoming data
+                        int counterFade = 0;
+                        int fadeTimeCounter = 0;
 
-                            if (wholeString[i] == '#'  ) {
+                        //                        MAX_STR_LENGTH
+                        for (wholeStringCounter = 0 ; wholeStringCounter < MAX_STR_LENGTH ; wholeStringCounter ++) {                                       // Pass on the whole array of incoming data
+                            switch (wholeString[wholeStringCounter]) {
+                            case '#' : {
                                 for (n = 0;n <6;n++) {                                                             // Store the unformatted data to color array
-                                    if (wholeString[i+1+n] == 0x00) {
+                                    if (wholeString[wholeStringCounter+1+n] == 0x00) {
                                         break;
                                     }
-                                    incomingColor[n] = wholeString[i+1+n];                                        // The first string is the switch case command
-
+                                    incomingColor[n] = wholeString[wholeStringCounter+1+n];                                        // The first string is the switch case command
                                 }
-
                                 converIncomingColor();
 
                                 for (n = 0 ; n < 3 ; n++) {                                             // Copy converted sequence to 2D array
@@ -345,11 +346,25 @@ void main (void)
                                 if (seqCounter < MAX_SEQ_COLORS) {                                      // Check if not reached max colors
                                     seqCounter++;                                                       // Update sequence counter
                                 }
+                                break;
                             }
+                            case '-' : {
+                                counterFade=0;
+                                for (n=0;n<MAX_FADE_DECIMAL;n++) {                                              // parse incoming text and store only the fade numbers
+                                    if (wholeString[wholeStringCounter+1+n] >= '0'  & wholeString[wholeStringCounter+1+n] <= '9' ) {
+                                        unformatedFade[n] = wholeString[wholeStringCounter+1+n];                                   // Store the date after validating that this is ok
+                                        counterFade++;
+                                    }
+                                }
+
+                                colorFadeTimer[fadeTimeCounter] = parseFadeTimer(unformatedFade,counterFade);
+                                fadeTimeCounter++;
+                                break;
+                            }
+                            }
+
                         }
-                        // TODO add function that updates the timer
-                        // Convert the unformatted data in temp array to formated decimals
-                        //initFade();                 // Start the timers with the formated information
+                                       // Start the timers with the formated information
                         initFade(seqCounter);
 
                         // Test
@@ -365,18 +380,12 @@ void main (void)
                     case 'G' : {
 
                         sprintf(outString,"(%x,%x,%x)\n\r",(uint8_t)currentRGBColor[0],(uint8_t)currentRGBColor[1],(uint8_t)currentRGBColor[2]);
-//                        outString[1] = outString[1] - 32;
-//                        outString[2] = outString[2] - 32;
-//                        outString[4] = outString[4] - 32;
-//                        outString[5] = outString[5] - 32;
-//                        outString[7] = outString[7] - 32;
-//                        outString[8] = outString[8] - 32;
 
-//                        strcpy(outString,(uint8_t)currentRGBColor);
+                        //                        strcpy(outString,(uint8_t)currentRGBColor);
                         //strcpy(outString,"\r\nSet sequence, OK \r\n");                                     // Prepare String to send
-                                               USBCDC_sendDataInBackground((uint8_t*)outString,
-                                                                           strlen(outString),CDC0_INTFNUM,0);
-                    break;
+                        USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                    strlen(outString),CDC0_INTFNUM,0);
+                        break;
                     }
 
                     // Print device info + general information on commands
@@ -592,17 +601,23 @@ void printHelp() {
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
 
-    strcpy(outString,"B\t\t\t- Set Fade transition Colors B#RRGGBB#RRGGBB#RRGGBB....\n\n\r");
+    strcpy(outString,"G\t\t\t- Return current color, (rr,gg,bb)\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
 
-    strcpy(outString,"\t\t\t Fade transition time controlled by 'F' Command default 300ms\n\n\r");
+    strcpy(outString,"B\t\t\t- Set Fade transition Colors B#RRGGBB-tttt#RRGGBB....\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
 
-    strcpy(outString,"\nFirmware Revision: V0.8.1\n\n\r");
+    strcpy(outString,"\t\t\t Fade transition after each color \n\n\r");
+    // Send the response over USB
+    USBCDC_sendDataInBackground((uint8_t*)outString,
+                                strlen(outString),CDC0_INTFNUM,0);
+
+
+    strcpy(outString,"\nFirmware Revision: V0.8.3\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
