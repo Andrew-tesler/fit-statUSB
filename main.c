@@ -172,10 +172,14 @@ void main (void)
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
     //fadeTimer = 300;                                                                                    // Default timer 300ms
-    colorFadeTimer[0] = 300;
-    colorSeq[0][0] = 0;
-    colorSeq[0][1] = 0;
-    colorSeq[0][2] = 0;
+
+    for (n=0;n < MAX_SEQ_COLORS;n++) {
+        colorSeq[n][0] = 0;
+        colorSeq[n][1] = 0;
+        colorSeq[n][2] = 0;
+        colorFadeTimer[n] = 300;
+
+    }
 
 
     __bis_SR_register( GIE );                                                                           // Enable interrupts globally
@@ -582,12 +586,6 @@ uint8_t retInString (char* string)
  *
  */
 void printHelp() {
-    // This section will get the information for status Information()
-    // SN
-    // Date of ATP
-    // Software Rev.
-    // HW revision
-    // Status of LEDS
 
     // Prepare the first line of print
     strcpy(outString,"*******************************************************\n\n\r");
@@ -710,25 +708,6 @@ char chrToHx(uint8_t number) {
     return formated;
     // return formated+0x00;
 }
-
-
-
-//void write_infoB( uint16_t *value, uint16_t *flashLocation )
-//{
-//    uint16_t status;
-//
-//    // Erase INFOB
-//    do {
-//         FlashCtl_eraseSegment( (uint8_t*)INFOB_START );
-//         status = FlashCtl_performEraseCheck( (uint8_t*)INFOB_START, NUMBER_OF_BYTES );
-//    } while (status == STATUS_FAIL);
-//
-//    // Flash Write
-//    FlashCtl_write16( (uint16_t*) value,
-//                      (uint16_t*) flashLocation,
-//                      1
-//    );
-//}
 
 
 // Convert incoming color Asci to Decimal numbers and store in global
