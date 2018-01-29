@@ -123,6 +123,7 @@ void printHelp(void);
 char chrToHx(uint8_t);
 void converIncomingColor(void);                                                                         // Convert incoming color to formated color
 uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter);
+char intToHex(uint8_t);                                                                                  // Convert from int to char to print current color
 // ****************************************************************************************************
 
 
@@ -266,6 +267,9 @@ void main (void)
 
                         }
                         converIncomingColor();                                                          // Convert the unformatted data in temp array to formated decimals
+                        currentRGBColor[0] = formatedColor[0];
+                        currentRGBColor[1] = formatedColor[1];
+                        currentRGBColor[2] = formatedColor[2];
                         initTimers(formatedColor[0],formatedColor[1],formatedColor[2]);                 // Start the timers with the formated information
 
                         // Test
@@ -356,6 +360,24 @@ void main (void)
 
 
                         break;
+                    }
+
+                    // Return current color
+                    case 'G' : {
+
+                        sprintf(outString,"(%x,%x,%x)\n\r",(uint8_t)currentRGBColor[0],(uint8_t)currentRGBColor[1],(uint8_t)currentRGBColor[2]);
+//                        outString[1] = outString[1] - 32;
+//                        outString[2] = outString[2] - 32;
+//                        outString[4] = outString[4] - 32;
+//                        outString[5] = outString[5] - 32;
+//                        outString[7] = outString[7] - 32;
+//                        outString[8] = outString[8] - 32;
+
+//                        strcpy(outString,(uint8_t)currentRGBColor);
+                        //strcpy(outString,"\r\nSet sequence, OK \r\n");                                     // Prepare String to send
+                                               USBCDC_sendDataInBackground((uint8_t*)outString,
+                                                                           strlen(outString),CDC0_INTFNUM,0);
+                    break;
                     }
 
                     // Print device info + general information on commands
@@ -647,7 +669,6 @@ char chrToHx(uint8_t number) {
     case 70:
         formated=0xF;
         break;
-
     }
     //    formated = number - 55;
     return formated;
@@ -749,3 +770,39 @@ uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter) {
 
 }
 
+char intToHex(uint8_t number) {
+    char formated;
+        switch (number) {
+        case 0:
+            formated=0x30;
+            break;
+        case 1:
+            formated=0x31;
+            break;
+        case 2:
+            formated=0x32;
+            break;
+        case 3:
+            formated=0x33;
+            break;
+        case 4:
+            formated=0x34;
+            break;
+        case 5:
+            formated=0x35;
+            break;
+        case 6:
+            formated=0x36;
+            break;
+        case 7:
+            formated=0x37;
+            break;
+        case 8:
+            formated=0x38;
+            break;
+        case 9:
+            formated=0x39;
+            break;
+        }
+        return formated;
+}
