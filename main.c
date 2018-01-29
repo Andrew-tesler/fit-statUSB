@@ -122,8 +122,7 @@ uint8_t retInString (char* string);
 void printHelp(void);
 char chrToHx(uint8_t);
 void converIncomingColor(void);                                                                         // Convert incoming color to formated color
-uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter);
-char intToHex(uint8_t);                                                                                  // Convert from int to char to print current color
+uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter);                                                                               // Convert from int to char to print current color
 // ****************************************************************************************************
 
 
@@ -768,41 +767,4 @@ uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter) {
     return formated;
 
 
-}
-
-char intToHex(uint8_t number) {
-    char formated;
-        switch (number) {
-        case 0:
-            formated=0x30;
-            break;
-        case 1:
-            formated=0x31;
-            break;
-        case 2:
-            formated=0x32;
-            break;
-        case 3:
-            formated=0x33;
-            break;
-        case 4:
-            formated=0x34;
-            break;
-        case 5:
-            formated=0x35;
-            break;
-        case 6:
-            formated=0x36;
-            break;
-        case 7:
-            formated=0x37;
-            break;
-        case 8:
-            formated=0x38;
-            break;
-        case 9:
-            formated=0x39;
-            break;
-        }
-        return formated;
 }
