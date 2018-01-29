@@ -258,7 +258,7 @@ void main (void)
                         Timer_B_stop(TIMER_B0_BASE);                                                    // Stop Timer B0
                         //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative mode for GPIO LEDS
                         // Store the data to array
-                        for (i=0;i<6;i++) {                                                             // Store the unformatted data to color array
+                        for (i=0;i<=MAX_FADE_DECIMAL;i++) {                                                             // Store the unformatted data to color array
                             if (wholeString[i+1] == 0x00) {
                                 break;
                             }
