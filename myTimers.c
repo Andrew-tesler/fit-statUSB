@@ -83,24 +83,24 @@ void initTimers(int red,int green,int blue) {
     Timer_A_initCompareModeParam initCompareParamcc1 = {0};
     initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
     initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    //    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+//    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+            initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc1.compareValue			= Red;
     //
     // Blue
     Timer_A_initCompareModeParam initCompareParamcc2 = {0};
     initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
     initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    //    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+//    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+            initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc2.compareValue			= Blue;
 
     // Red
     Timer_A_initCompareModeParam initCompareParamcc3 = {0};
     initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
     initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    //    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+//    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+            initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc3.compareValue			= Green;
     //
     Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -165,15 +165,17 @@ void initFade(uint8_t colorNum) {
     //    colorFadeTimer[2] = 3000;
     //    colorFadeTimer[3] = 20;
 
-    for (justCounter = 0 ; justCounter < colorsNumber-1 ; justCounter++) {
-        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+    for (justCounter = 0 ; justCounter < colorsNumber-1 ; justCounter++) {                                                                    // The last run of the loop calculates the time from the last element to first element
+        for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {                                                                  // Each R,G,B color calculation
 
             colorFadeDiff[justCounter][smallerCounter] = (colorSeq[justCounter+1][smallerCounter] - colorSeq[justCounter][smallerCounter]) / colorFadeTimer[justCounter];
-
         }
     }
-
-    initfadeClock();                                                                                                                        // Start Timer B0
+    // Calculate the last transition
+    for (smallerCounter = 0 ; smallerCounter < 3 ; smallerCounter++) {
+        colorFadeDiff[colorsNumber-1][smallerCounter] = (colorSeq[0][smallerCounter] - colorSeq[colorsNumber-1][smallerCounter]) / colorFadeTimer[colorsNumber-1];
+    }
+    initfadeClock();                                                                                                                        // Start Timer_B0
 }
 
 // Function to be called by TIMER0_B0 that will update the current color according to calculated values
@@ -181,23 +183,26 @@ void updateFadeColor(){
     Timer_A_stop(TIMER_A0_BASE);// Stop Timer
 
 
-    switch (direction) {
-    case 0: {
-        currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
-        currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
-        currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
-        break;
-    }
+    //    switch (direction) {
+    //    case 0: {
+    //        currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
+    //        currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
+    //        currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
+    //        break;
+    //    }
+    //
+    //    case 1: {
+    //        currentRGBColor[0] =   currentRGBColor[0] - colorFadeDiff[fadeArrayLocation][0];
+    //        currentRGBColor[1] =   currentRGBColor[1] - colorFadeDiff[fadeArrayLocation][1];
+    //        currentRGBColor[2] =   currentRGBColor[2] - colorFadeDiff[fadeArrayLocation][2];
+    //        break;
+    //    }
+    //    }
 
-    case 1: {
-        currentRGBColor[0] =   currentRGBColor[0] - colorFadeDiff[fadeArrayLocation][0];
-        currentRGBColor[1] =   currentRGBColor[1] - colorFadeDiff[fadeArrayLocation][1];
-        currentRGBColor[2] =   currentRGBColor[2] - colorFadeDiff[fadeArrayLocation][2];
-        break;
-    }
-    }
 
-
+    currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
+    currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
+    currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
     initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
 
 
@@ -226,33 +231,47 @@ __interrupt void timer_ISRB0 (void) {
         if (disableDirection == 1) {
             Timer_B_stop(TIMER_B0_BASE);
         }
-        switch (direction) {
 
-        case 0: {   // Move forward
-            if (fadeArrayLocation == colorsNumber-2) {
-                direction = !direction;
-                //colorLocation=0;
-            }
-            else if (fadeArrayLocation < colorsNumber-2){
-                fadeArrayLocation++;
-            }
+        if (fadeArrayLocation == colorsNumber-1) {
+            fadeArrayLocation = 0;
+            //colorLocation=0;
+        }
+        else if (fadeArrayLocation < colorsNumber-1){
+            fadeArrayLocation++;
+        }
+        //        fadeArrayLocation++;
+        //        fadeArrayLocation %= colorsNumber; // return fadeArraylocation to zero if reached colorsNumber
 
-            colorLocation=0;
-            break;
-        }
-        case 1: {  // Move backward
-            if (fadeArrayLocation == 0) {
-                direction = !direction;
-                //colorLocation=0;
-            }
-            else if (fadeArrayLocation > 0) {
-                fadeArrayLocation--;
-            }
-            colorLocation=0;
-            break;
-        }
+        colorLocation=0;
 
-        }
+
+        //        switch (direction) {
+        //
+        //        case 0: {   // Move forward
+        //            if (fadeArrayLocation == colorsNumber-2) {
+        //                direction = !direction;
+        //                //colorLocation=0;
+        //            }
+        //            else if (fadeArrayLocation < colorsNumber-2){
+        //                fadeArrayLocation++;
+        //            }
+        //
+        //            colorLocation=0;
+        //            break;
+        //        }
+        //        case 1: {  // Move backward
+        //            if (fadeArrayLocation == 0) {
+        //                direction = !direction;
+        //                //colorLocation=0;
+        //            }
+        //            else if (fadeArrayLocation > 0) {
+        //                fadeArrayLocation--;
+        //            }
+        //            colorLocation=0;
+        //            break;
+        //        }
+        //
+        //        }
 
 
 

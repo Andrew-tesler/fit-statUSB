@@ -172,13 +172,12 @@ void main (void)
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
     //fadeTimer = 300;                                                                                    // Default timer 300ms
-
+    colorFadeTimer[MAX_SEQ_COLORS] = 300;                                                                // Last element initialization
     for (n=0;n < MAX_SEQ_COLORS;n++) {
         colorSeq[n][0] = 0;
         colorSeq[n][1] = 0;
         colorSeq[n][2] = 0;
         colorFadeTimer[n] = 300;
-
     }
 
 
@@ -637,7 +636,7 @@ void printHelp() {
                                 strlen(outString),CDC0_INTFNUM,0);
 
 
-    strcpy(outString,"\nFirmware Revision: V0.9.0\n\n\r");
+    strcpy(outString,"\nFirmware Revision: V0.9.1\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
