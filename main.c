@@ -636,7 +636,7 @@ void printHelp() {
                                 strlen(outString),CDC0_INTFNUM,0);
 
 
-    strcpy(outString,"\nFirmware Revision: V0.9.1\n\n\r");
+    strcpy(outString,"\nFirmware Revision: V0.9.2\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
