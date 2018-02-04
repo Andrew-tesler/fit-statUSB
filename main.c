@@ -105,7 +105,8 @@ uint8_t unformatedFade[MAX_FADE_DECIMAL] = "";                                  
 
 long formated;
 uint32_t decimals;
-
+int counterFade;
+int fadeTimeCounter;
 //uint16_t count;
 //uint16_t c = 0;
 //unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
@@ -360,8 +361,8 @@ void main (void)
                         Timer_B_stop(TIMER_B0_BASE);                                                                                // Stop Timer B0
                         GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);                                // Set alternative mode for GPIO LEDS
                         seqCounter = 0 ;                                                                                            // Reset Sequence color
-                        int counterFade = 0;
-                        int fadeTimeCounter = 0;
+                        counterFade = 0;
+                        fadeTimeCounter = 0;
                         disableDirection = 0;
 
                         //                        MAX_STR_LENGTH
@@ -406,6 +407,8 @@ void main (void)
                             }
 
                         }
+                        direction = 0;
+
                         // Start the timers with the formated information
                         initFade(seqCounter);
 
@@ -780,7 +783,7 @@ uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter) {
     //    MAX_FADE_DECIMAL
     formated = 0;
     decimals = 1 ;                                                                             // Decimal number to calculated later
-    fadeTimer = 0;
+    //fadeTimer = 0;
 
     for (i = 0 ; i < fadeCounter ; i++) {
         decimals = decimals*10;
