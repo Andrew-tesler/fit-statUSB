@@ -174,8 +174,10 @@ void main (void)
 
     strncat(deviceSN,(char *)SERIAL_ptrB,10);
     strcat(deviceSN,"\r\n\r\n");
-    //fadeTimer = 300;                                                                                    // Default timer 300ms
-    colorFadeTimer[MAX_SEQ_COLORS] = 300;                                                                // Last element initialization
+    fadeTimer = 300;                                                                                    // Default timer 300ms
+
+    colorFadeTimer[MAX_SEQ_COLORS] = 500;                                                                // Last element initialization
+
     for (n=0;n < MAX_SEQ_COLORS;n++) {
         colorSeq[n][0] = 0;
         colorSeq[n][1] = 0;
@@ -293,7 +295,7 @@ void main (void)
                         colorSeq[1][0] = formatedColor[0];
                         colorSeq[1][1] = formatedColor[1];
                         colorSeq[1][2] = formatedColor[2];
-                                                                                  // Convert the unformatted data in temp array to formated decimals
+                        // Convert the unformatted data in temp array to formated decimals
                         initFade(2);
 
 
@@ -337,9 +339,10 @@ void main (void)
                             }
                         }
 
-
                         direction = 0;
-                        colorFadeTimer[0] = parseFadeTimer(unformatedFade,counterFade);                         // Convert the User Input to decimal numbers
+
+                        //                        colorFadeTimer[0] = parseFadeTimer(unformatedFade,counterFade);                         // Convert the User Input to decimal numbers
+                        fadeTimer = parseFadeTimer(unformatedFade,counterFade);
                         //GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative function
                         //updateFadeTime(fadeTimer);          // TODO test
                         // Restart the fade function with the designated fade time
@@ -650,7 +653,7 @@ void printHelp() {
                                 strlen(outString),CDC0_INTFNUM,0);
 
 
-    strcpy(outString,"\nFirmware Revision: V0.9.2\n\n\r");
+    strcpy(outString,"\nFirmware Revision: V0.9.3\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);

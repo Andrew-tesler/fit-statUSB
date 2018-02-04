@@ -9,7 +9,7 @@
 #define MYTIMERS_H_
 
 //float fadeTimer;
-int fadeTimer;
+long fadeTimer;
 uint32_t colortick;
 int timeCounter;
 
