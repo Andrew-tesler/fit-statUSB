@@ -202,6 +202,8 @@ void main (void)
     //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
 
     allOff();
+    initTimers(0,0,5);
+    currentRGBColor[2] = 5;
 
     while (1)
     {
@@ -261,8 +263,9 @@ void main (void)
                         // Send String here the USB will kill itself next
                         USBCDC_sendDataInBackground((uint8_t*)outString,
                                                     strlen(outString),CDC0_INTFNUM,0);
-                        Timer_B_stop(TIMER_B0_BASE);
-                        Timer_A_stop(TIMER_A0_BASE);
+
+//                        Timer_A_stop(TIMER_A0_BASE);
+//                        Timer_B_stop(TIMER_B0_BASE);
                         // Programming mode
                         USB_disconnect();                           // Disconnect USB device
                         __disable_interrupt();                      // Disable global interrupt
@@ -659,7 +662,7 @@ void printHelp() {
                                 strlen(outString),CDC0_INTFNUM,0);
 
 
-    strcpy(outString,"\nFirmware Revision: V0.9.4\n\n\r");
+    strcpy(outString,"\nFirmware Revision: V0.9.5\n\n\r");
     // Send the response over USB
     USBCDC_sendDataInBackground((uint8_t*)outString,
                                 strlen(outString),CDC0_INTFNUM,0);
