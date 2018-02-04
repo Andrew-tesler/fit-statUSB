@@ -83,24 +83,39 @@ void initTimers(int red,int green,int blue) {
     Timer_A_initCompareModeParam initCompareParamcc1 = {0};
     initCompareParamcc1.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_1;
     initCompareParamcc1.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    //    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+#ifdef ARDUMSP
+    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;
+#else
+    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;
+#endif //ARDUMSP
+    //        initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+    //    initCompareParamcc1.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc1.compareValue			= Red;
     //
     // Blue
     Timer_A_initCompareModeParam initCompareParamcc2 = {0};
     initCompareParamcc2.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_2;
     initCompareParamcc2.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    //    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+#ifdef ARDUMSP
+    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;
+#else
+    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;
+#endif //ARDUMSP
+    //        initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+    //    initCompareParamcc2.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc2.compareValue			= Blue;
 
     // Red
     Timer_A_initCompareModeParam initCompareParamcc3 = {0};
     initCompareParamcc3.compareRegister 		= TIMER_A_CAPTURECOMPARE_REGISTER_3;
     initCompareParamcc3.compareInterruptEnable	= TIMER_A_CAPTURECOMPARE_INTERRUPT_DISABLE;
-    //    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
-    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
+#ifdef ARDUMSP
+    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;
+#else
+    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;
+#endif //ARDUMSP
+    //        initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_TOGGLE_SET;    // ARDUMSP
+    //    initCompareParamcc3.compareOutputMode       = TIMER_A_OUTPUTMODE_SET_RESET;     // FITSTATUSB
     initCompareParamcc3.compareValue			= Green;
     //
     Timer_A_initCompareMode(TIMER_A0_BASE, &initCompareParamcc1);
@@ -158,7 +173,7 @@ void initFade(uint8_t colorNum) {
     currentRGBColor[0] = colorSeq[0][0];
     currentRGBColor[1] = colorSeq[0][1];
     currentRGBColor[2] = colorSeq[0][2];
-//    colorFadeTimer = 0;
+    //    colorFadeTimer = 0;
 
     // Debug
     //colorFadeTimer[0] = 1000;
@@ -210,9 +225,9 @@ void updateFadeColor(){
     //    currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
     //    currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
     //    currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
-//    currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
-//    currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
-//    currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
+    //    currentRGBColor[0] =   currentRGBColor[0] + colorFadeDiff[fadeArrayLocation][0];
+    //    currentRGBColor[1] =   currentRGBColor[1] + colorFadeDiff[fadeArrayLocation][1];
+    //    currentRGBColor[2] =   currentRGBColor[2] + colorFadeDiff[fadeArrayLocation][2];
 
 
     initTimers(currentRGBColor[0],currentRGBColor[1],currentRGBColor[2]);
@@ -234,20 +249,28 @@ __interrupt void timer_ISRB0 (void) {
     // direction     -- Direction of the fade   // colorsNumber  -- Total number of array size of fade diff
 
 
-    currentRGBColor[0] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][0]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][0];
-    currentRGBColor[1] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][1]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][1];
-    currentRGBColor[2] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][2]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][2];
+    //    currentRGBColor[0] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][0]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][0];
+    //    currentRGBColor[1] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][1]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][1];
+    //    currentRGBColor[2] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][2]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][2];
+
+    colorLocation++;
+
+    if (colorLocation > colorFadeTimer[fadeArrayLocation] ) {
+        currentRGBColor[0] =   (((colorLocation-colorFadeTimer[fadeArrayLocation]) * colorFadeDiff[fadeArrayLocation][0]) /  fadeTimer) + colorSeq[fadeArrayLocation][0];
+        currentRGBColor[1] =   (((colorLocation-colorFadeTimer[fadeArrayLocation]) * colorFadeDiff[fadeArrayLocation][1]) /  fadeTimer) + colorSeq[fadeArrayLocation][1];
+        currentRGBColor[2] =   (((colorLocation-colorFadeTimer[fadeArrayLocation]) * colorFadeDiff[fadeArrayLocation][2]) /  fadeTimer) + colorSeq[fadeArrayLocation][2];
+    }
 
 
     updateFadeColor();
 
 
 
-    colorLocation++;
-//
-//
-    if (colorLocation >= colorFadeTimer[fadeArrayLocation]){   // Test if the array of the color reached its limits
-//
+
+    //
+    //
+    if (colorLocation >= colorFadeTimer[fadeArrayLocation]+ fadeTimer){   // Test if the array of the color reached its limits
+        //
         if (disableDirection == 1) {
             Timer_B_stop(TIMER_B0_BASE);
         }
@@ -259,9 +282,9 @@ __interrupt void timer_ISRB0 (void) {
         else if (fadeArrayLocation < colorsNumber-1){
             fadeArrayLocation++;
         }
-//        //        fadeArrayLocation++;
-//        //        fadeArrayLocation %= colorsNumber; // return fadeArraylocation to zero if reached colorsNumber
-//
+        //        //        fadeArrayLocation++;
+        //        //        fadeArrayLocation %= colorsNumber; // return fadeArraylocation to zero if reached colorsNumber
+        //
         colorLocation=0;
 
 
