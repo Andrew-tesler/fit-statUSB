@@ -103,6 +103,9 @@ uint8_t formatedColor[3];                                                       
 
 uint8_t unformatedFade[MAX_FADE_DECIMAL] = "";                                                          // Unformatted Fade tempt storage
 
+long formated;
+uint32_t decimals;
+
 //uint16_t count;
 //uint16_t c = 0;
 //unsigned char tempR,tempR2,tempG,tempG2,tempB,tempB2 = 0;
@@ -178,6 +181,11 @@ void main (void)
         colorSeq[n][1] = 0;
         colorSeq[n][2] = 0;
         colorFadeTimer[n] = 300;
+
+    }
+
+    for (n = 0 ; n < MAX_FADE_DECIMAL ; n++) {
+        unformatedFade[n] = 0x00;
     }
 
 
@@ -345,40 +353,46 @@ void main (void)
                     // Set color sequence B#RRGGBB#RRGGBB#RRGGBB.....
                     case 'B' : {
 
-                        Timer_A_stop(TIMER_A0_BASE);                                                    // Stop Timer A0
-                        Timer_B_stop(TIMER_B0_BASE);                                                    // Stop Timer B0
-                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);    // Set alternative mode for GPIO LEDS
-                        seqCounter = 0 ;                                                                // Reset Sequence color
+                        Timer_A_stop(TIMER_A0_BASE);                                                                                // Stop Timer A0
+                        Timer_B_stop(TIMER_B0_BASE);                                                                                // Stop Timer B0
+                        GPIO_setAsPeripheralModuleFunctionOutputPin(LED_PORT,LED_R + LED_G + LED_B);                                // Set alternative mode for GPIO LEDS
+                        seqCounter = 0 ;                                                                                            // Reset Sequence color
                         int counterFade = 0;
                         int fadeTimeCounter = 0;
                         disableDirection = 0;
 
                         //                        MAX_STR_LENGTH
-                        for (wholeStringCounter = 0 ; wholeStringCounter < MAX_STR_LENGTH ; wholeStringCounter ++) {                                       // Pass on the whole array of incoming data
+                        for (wholeStringCounter = 0 ; wholeStringCounter < MAX_STR_LENGTH ; wholeStringCounter ++) {                // Pass on the whole array of incoming data
                             switch (wholeString[wholeStringCounter]) {
                             case '#' : {
-                                for (n = 0;n <6;n++) {                                                             // Store the unformatted data to color array
+                                for (n = 0;n <6;n++) {                                                                              // Store the unformatted data to color array
                                     if (wholeString[wholeStringCounter+1+n] == 0x00) {
                                         break;
                                     }
-                                    incomingColor[n] = wholeString[wholeStringCounter+1+n];                                        // The first string is the switch case command
+                                    incomingColor[n] = wholeString[wholeStringCounter+1+n];                                         // The first string is the switch case command
+//                                    wholeString[wholeStringCounter+1+n] = 0x00;                                                     // Remove old data
                                 }
                                 converIncomingColor();
 
-                                for (n = 0 ; n < 3 ; n++) {                                             // Copy converted sequence to 2D array
+                                for (n = 0 ; n < 3 ; n++) {                                                                         // Copy converted sequence to 2D array
                                     colorSeq[seqCounter][n] = formatedColor[n];
+//                                    formatedColor[n] = 0;                                                                           // Remove old data
                                 }
-                                if (seqCounter < MAX_SEQ_COLORS) {                                      // Check if not reached max colors
-                                    seqCounter++;                                                       // Update sequence counter
+                                if (seqCounter < MAX_SEQ_COLORS) {                                                                  // Check if not reached max colors
+                                    seqCounter++;                                                                                   // Update sequence counter
                                 }
                                 break;
                             }
                             case '-' : {
                                 counterFade=0;
-                                for (n=0;n<MAX_FADE_DECIMAL;n++) {                                              // parse incoming text and store only the fade numbers
+                                for (n=0;n<MAX_FADE_DECIMAL;n++) {                                                                  // parse incoming text and store only the fade numbers
                                     if (wholeString[wholeStringCounter+1+n] >= '0'  & wholeString[wholeStringCounter+1+n] <= '9' ) {
-                                        unformatedFade[n] = wholeString[wholeStringCounter+1+n];                                   // Store the date after validating that this is ok
+                                        unformatedFade[n] = wholeString[wholeStringCounter+1+n];                                    // Store the date after validating that this is ok
+//                                        wholeString[wholeStringCounter+1+n] = 0x00;                                                 // Remove old data
                                         counterFade++;
+                                    }
+                                    else {
+                                        break;
                                     }
                                 }
 
@@ -761,8 +775,8 @@ void converIncomingColor() {
 // Gets array of unformatted Decimal ACSCII and convert them to fade number that the program can use
 uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter) {
     //    MAX_FADE_DECIMAL
-    uint32_t formated = 0;
-    uint32_t decimals = 1 ;                                                                             // Decimal number to calculated later
+    formated = 0;
+    decimals = 1 ;                                                                             // Decimal number to calculated later
     fadeTimer = 0;
 
     for (i = 0 ; i < fadeCounter ; i++) {
@@ -775,6 +789,7 @@ uint32_t parseFadeTimer(uint8_t unformated[],uint8_t fadeCounter) {
 
         decimals = decimals/10;                                                                         // Reduce the decimal size
         formated = formated + (unformated[i]*decimals);                                                 // Multiply and store the number
+        unformated[i] = 0;
 
     }
 
