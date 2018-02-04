@@ -297,6 +297,9 @@ void main (void)
                         colorSeq[1][1] = formatedColor[1];
                         colorSeq[1][2] = formatedColor[2];
                         // Convert the unformatted data in temp array to formated decimals
+                        colorFadeTimer[0] = 10;                                                         // To simulate instant transition
+
+
                         initFade(2);
 
 
