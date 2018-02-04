@@ -248,6 +248,7 @@ __interrupt void timer_ISRB0 (void) {
     // colorLocation -- Color location in each of the fade diff array colors
     // direction     -- Direction of the fade   // colorsNumber  -- Total number of array size of fade diff
 
+    colorLocation++;
 
     //    currentRGBColor[0] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][0]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][0];
     //    currentRGBColor[1] =   ((colorLocation * colorFadeDiff[fadeArrayLocation][1]) /  colorFadeTimer[fadeArrayLocation]) + colorSeq[fadeArrayLocation][1];
