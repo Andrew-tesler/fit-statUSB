@@ -444,18 +444,6 @@ void main (void)
                         printHelp();
                     }
 
-                    // Test for the analog Input Pin
-                    case 'T' : {
-                        GPIO_setAsOutputPin(GPIO_PORT_P1,GPIO_PIN0);
-                        ADC10_A_init(ADC10_A_BASE,
-                            ADC10_A_SAMPLEHOLDSOURCE_SC,
-                            ADC10_A_CLOCKSOURCE_ADC10OSC,
-                            ADC10_A_CLOCKDIVIDER_1);
-
-
-
-                    }
-
                     default :
                         strcpy(outString,"\r\n");                                                         // Send new Line when return pressed
                         USBCDC_sendDataInBackground((uint8_t*)outString,
