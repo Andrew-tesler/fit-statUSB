@@ -1,4 +1,4 @@
-## Welcome to GitHub Pages
+## Welcome to GitHub fit-statUSB page
 
 [![GitHub version](https://img.shields.io/github/release-pre/Andrew-tesler/fit-statUSB.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/releases/latest)
 [![GitHub download](https://img.shields.io/github/downloads-pre/Andrew-tesler/fit-statUSB/latest/total.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/releases/latest)
