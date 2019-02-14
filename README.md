@@ -8,7 +8,11 @@
 * fit-statUSB is a programmable fingernail-size color LED that plugs into a USB port.
 * fit-statUSB provides status indication by changing the LED color, brightness and color cycle.
 * fit-statUSB identifies to the PC as a serial device and changes the LED color by text commands received over the serial port.
-* See [https://fit-iot.com/web/product/fit-statusb/ fit-statUSB product page]
+
+* See [fit-statUSB project page](https://fit-iot.com/web/product/fit-statusb/) or [Amazon store page](https://www.amazon.com/dp/B07CKFLQ5V)
+
+* [Application notes](https://www.fit-pc.com/forum/viewforum.php?f=175) -Courtesy of fit-PC forum member hassellbear 
+
 
 
 
