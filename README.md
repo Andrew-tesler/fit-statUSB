@@ -10,6 +10,7 @@
 * fit-statUSB identifies to the PC as a serial device and changes the LED color by text commands received over the serial port.
 * See [https://fit-iot.com/web/product/fit-statusb/ fit-statUSB product page]
 
+#1Please see 
 
 # Commands
 ## General 
