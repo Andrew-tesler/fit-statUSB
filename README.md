@@ -1,6 +1,6 @@
 ## Welcome to GitHub fit-statUSB page
 
-[![GitHub version](https://img.shields.io/github/release-pre/Andrew-tesler/fit-statUSB.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/releases/latest)
+[![GitHub version](https://img.shields.io/github/release/Andrew-tesler/fit-statUSB.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/releases/latest)
 [![GitHub download](https://img.shields.io/github/downloads-pre/Andrew-tesler/fit-statUSB/latest/total.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/releases/latest)
 [![GitHub issues](https://img.shields.io/github/issues-raw/Andrew-tesler/fit-statUSB.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/Andrew-tesler/fit-statUSB.svg?style=flat)](https://github.com/Andrew-tesler/fit-statUSB/commits/master)
@@ -8,7 +8,12 @@
 * fit-statUSB is a programmable fingernail-size color LED that plugs into a USB port.
 * fit-statUSB provides status indication by changing the LED color, brightness and color cycle.
 * fit-statUSB identifies to the PC as a serial device and changes the LED color by text commands received over the serial port.
-* See [https://fit-iot.com/web/product/fit-statusb/ fit-statUSB product page]
+
+* See [fit-statUSB project page](https://fit-iot.com/web/product/fit-statusb/) or [Amazon store page](https://www.amazon.com/dp/B07CKFLQ5V)
+
+* [Application notes](https://www.fit-pc.com/forum/viewforum.php?f=175) -Courtesy of fit-PC forum member hassellbear 
+
+
 
 
 # Commands
