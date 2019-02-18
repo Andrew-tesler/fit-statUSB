@@ -86,12 +86,12 @@ For B command the F value will determine transition period between colors.
 * [https://fit-iot.com/files/download/accessories/fit-statusb/sw/Win8.1/msp430_cdc.zip Fit-statUSB Windows 8.1 driver]
 * Additional drivers are not required for Windows 10 operating systems
 
-### Using fit-statUSB from terminal ===
+### Using fit-statUSB from terminal 
 * Open a terminal utility with serial port support (e.g. [https://ttssh2.osdn.jp Teraterm])
 * Establish new connection to the serial port assigned to fit-statUSB (in TeraTerm: File --> New connection --> Serial (select COMn: USB Serial Device)
 * Type a command, e.g. #FF0000 (fit-statUSB should turn RED)
 Note there is no command editing (no backspace / delete). If you mistype please start a new command.
-### Using fit-statUSB from command line ===
+### Using fit-statUSB from command line 
 
 ```
  echo [command] > \\.\[com port]
@@ -159,7 +159,7 @@ echo "B#FF0000-1000#00FF00-500" > /dev/ttyACM0
 ```
 - Please note that some Linux distributions will require sudo privileges to echo directly to serial
 
-==== Sample Python code ====
+### Sample Python code
 * Python dependencies: pyserial
  ```
  import serial<br>
