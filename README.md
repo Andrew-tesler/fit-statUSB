@@ -81,7 +81,7 @@ For B command the F value will determine transition period between colors.
 * G - Return current color, (rr,gg,bb)
 
 ## Using fit-statUSB in Windows 
-### Drivers ===
+### Drivers 
 * [https://fit-iot.com/files/download/accessories/fit-statusb/sw/Win7/msp430_ti_signed.inf Fit-statUSB Windows 7 driver]
 * [https://fit-iot.com/files/download/accessories/fit-statusb/sw/Win8.1/msp430_cdc.zip Fit-statUSB Windows 8.1 driver]
 * Additional drivers are not required for Windows 10 operating systems
