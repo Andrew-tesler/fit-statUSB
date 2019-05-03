@@ -197,9 +197,7 @@ void main (void)
 
     __enable_interrupt();  // Enable interrupts globally
 
-    // Gather information from the card
-    //strcpy(deviceSN,"Serial No:\t\t\t1234567890\n\r");
-    //  strcpy(deviceSN,"Device SN: 56987\t Rev.1.0\r\n\r\n");
+
 
     allOff();
     initTimers(0,0,5);
